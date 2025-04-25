@@ -1,0 +1,57 @@
+cmake_minimum_required(VERSION 3.13)
+
+option(PRODUCTION_BUILD "Make this a production build" OFF)
+
+#include cpp runtime in the build so there are no errors for other users
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
+
+project("RenderToy")
+set(CMAKE_SXX_STANDARD 17)
+add_executable(${CMAKE_PROJECT_NAME})
+
+# MY_SOURCES is defined to be a list of all the source files for my game 
+file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" 
+												"${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
+												"${CMAKE_CURRENT_SOURCE_DIR}/vendor/*.c"
+												"${CMAKE_CURRENT_SOURCE_DIR}/vendor/*.h")
+
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
+
+if(PRODUCTION_BUILD)
+	# setup the ASSETS_PATH macro to be in the root folder of your exe
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="./resources/") 
+
+	# remove the option to debug asserts.
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1) 
+
+else()
+	# This is useful to get an ASSETS_PATH in your IDE during development
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
+	target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0) 
+
+endif()
+
+# Libraries:
+# GLFW
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/glfw/include)
+target_link_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/glfw/lib-vc2022)
+# imgui
+# Set where the ImGui files are stored
+set(IMGUI_PATH "dependencies/imgui")
+# Compile as static library 
+file(GLOB IMGUI_SOURCES ${IMGUI_PATH}/*.cpp) 
+add_library("ImGui" STATIC ${IMGUI_SOURCES})
+target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
+target_include_directories("ImGui" PRIVATE dependencies/glfw/include)
+# GLAD
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/glad/include)
+# GLM
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/)
+# Vendor
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/include)
+
+
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE opengl32 glfw3 ImGui)
