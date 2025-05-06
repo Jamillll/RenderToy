@@ -90,7 +90,7 @@ void RenderToy::Application::Run()
     VAO.UploadVertexData(sizeof(vertices), vertices, 4);
     VAO.UploadIndexData(sizeof(indices), indices, 6);
 
-    ShaderProgram shaders(RESOURCES_PATH "shaders/basicVertex.shader", RESOURCES_PATH "shaders/basicFrag.shader");
+    ShaderProgram shaders(RESOURCES_PATH "shaders/basicCombined.shader");
 
     while (m_Running)
     {
