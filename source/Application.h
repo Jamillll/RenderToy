@@ -1,4 +1,5 @@
 #pragma once
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 
@@ -6,8 +7,7 @@ namespace RenderToy
 {
 	struct ApplicationState
 	{
-		bool showDemoWindow = true;
-		bool showAnotherWindow = false;
+		bool showDemoWindow = false;
 	};
 
 	class Application

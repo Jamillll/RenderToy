@@ -4,22 +4,24 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
+#include "Renderer/ShaderProgram.h"
+
 RenderToy::Application::Application()
 {
     assert(glfwInit());
 
-    // GL 3.0 + GLSL 130
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 330";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
     //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // 3.0+ only
 
     // Create window with graphics context
-    m_Window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    m_Window = glfwCreateWindow(1280, 720, "RenderToy", nullptr, nullptr);
     assert(m_Window != nullptr);
 
     glfwMakeContextCurrent(m_Window);
+    gladLoadGL();
     glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
@@ -60,6 +62,49 @@ void RenderToy::Application::Run()
 {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+    ShaderProgram shaders(RESOURCES_PATH "shaders/basicVertex.shader", RESOURCES_PATH "shaders/basicFrag.shader");
+
+    // set up vertex data (and buffer(s)) and configure vertex attributes
+    // ------------------------------------------------------------------
+    float vertices[] = {
+         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f   // top left 
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
+    };
+    unsigned int VBO, VAO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+    glBindVertexArray(0);
+
+
     while (m_Running)
     {
         if (glfwWindowShouldClose(m_Window)) m_Running = false;
@@ -75,38 +120,27 @@ void RenderToy::Application::Run()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGui::DockSpaceOverViewport();
 
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        if (glfwGetKey(m_Window, GLFW_KEY_D))
+            m_State.showDemoWindow = !m_State.showDemoWindow;
+
         if (m_State.showDemoWindow)
             ImGui::ShowDemoWindow(&m_State.showDemoWindow);
 
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+        // main
         {
-            static float f = 0.0f;
-            static int counter = 0;
+            ImGui::Begin("Main");
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            ImGui::Checkbox("Demo Window", &m_State.showDemoWindow);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &m_State.showAnotherWindow);
-
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
 
-        // 3. Show another simple window.
-        if (m_State.showAnotherWindow)
+        // Sidebar
         {
-            ImGui::Begin("Another Window", &m_State.showAnotherWindow);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                m_State.showAnotherWindow = false;
+            ImGui::Begin("Sidebar");
+
+            ImGui::Text("This is some useful text.");
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
             ImGui::End();
         }
 
@@ -118,6 +152,11 @@ void RenderToy::Application::Run()
         
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        // draw our first triangle
+        shaders.Use();
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
