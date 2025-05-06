@@ -1,17 +1,17 @@
 #include "Renderer.h"
 
-void Renderer::Initialise()
+void RenderToy::Renderer::Initialise()
 {
 }
 
-void Renderer::Submit()
+void RenderToy::Renderer::Submit()
 {
 }
 
-void Renderer::StartFrame()
+void RenderToy::Renderer::StartFrame()
 {
 }
 
-void Renderer::EndFrame()
+void RenderToy::Renderer::EndFrame()
 {
 }

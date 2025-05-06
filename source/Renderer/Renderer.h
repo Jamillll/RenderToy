@@ -1,14 +1,17 @@
 #pragma once
 
-class Renderer
+namespace RenderToy
 {
-private:
+	class Renderer
+	{
+	private:
 
-public:
-	static void Initialise();
+	public:
+		static void Initialise();
 
-	static void Submit();
+		static void Submit();
 
-	static void StartFrame();
-	static void EndFrame();
-};
+		static void StartFrame();
+		static void EndFrame();
+	};
+}
