@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Buffer.h"
+#include "BufferLayout.h"
 
 namespace RenderToy
 {
@@ -14,7 +15,7 @@ namespace RenderToy
 		std::unique_ptr<Buffer> m_vbo = nullptr;
 		std::unique_ptr<Buffer> m_ebo = nullptr;
 	public:
-		VertexArray();
+		VertexArray(BufferLayout layout);
 		~VertexArray();
 
 		void AddIndexBuffer();

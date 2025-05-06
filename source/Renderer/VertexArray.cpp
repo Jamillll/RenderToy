@@ -2,17 +2,26 @@
 
 namespace RenderToy
 {
-	VertexArray::VertexArray()
+	VertexArray::VertexArray(BufferLayout layout)
 	{
 		glGenVertexArrays(1, &m_VertexArrayID);
 		glBindVertexArray(m_VertexArrayID);
 
 		m_vbo = std::make_unique<Buffer>(GL_ARRAY_BUFFER);
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
+		std::vector<BufferElement> elements(layout.GetLayout());
+
+		for (size_t i = 0; i < elements.size(); i++)
+		{
+			glVertexAttribPointer(
+				i, 
+				ShaderDataTypeSize(elements[i].Type),
+				ShaderDataTypeToGLenum(elements[i].Type),
+				elements[i].Normalised,
+				layout.GetStride(),
+				(void*)elements[i].Offset);
+			glEnableVertexAttribArray(i);
+		}
 
 		glBindVertexArray(0);
 	}

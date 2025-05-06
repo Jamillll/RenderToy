@@ -18,6 +18,8 @@ namespace RenderToy
 
 	void Buffer::UploadBufferData(int size, void* data, uint32_t count, GLenum usage)
 	{
+		m_Count = count;
+
 		Bind();
 		glBufferData(m_Type, size, data, usage);
 	}

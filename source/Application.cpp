@@ -6,6 +6,8 @@
 
 #include "Renderer/ShaderProgram.h"
 #include "Renderer/Buffer.h"
+#include "Renderer/VertexArray.h"
+#include "Renderer/BufferLayout.h"
 
 
 RenderToy::Application::Application()
@@ -64,38 +66,31 @@ void RenderToy::Application::Run()
 {
     ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-    ShaderProgram shaders(RESOURCES_PATH "shaders/basicVertex.shader", RESOURCES_PATH "shaders/basicFrag.shader");
-
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
-         0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f   // top left 
+         0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,  // top right
+         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,  // bottom left
+        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f   // top left 
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,  // first Triangle
         1, 2, 3   // second Triangle
     };
 
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    BufferLayout layout =
+    {
+        {"Position", ShaderDataType::Float3},
+        {"Colour", ShaderDataType::Float3}
+    };
 
-    Buffer VBO(GL_ARRAY_BUFFER);
-    VBO.UploadBufferData(sizeof(vertices), vertices, 6);
+    VertexArray VAO(layout);
+    VAO.AddIndexBuffer();
+    VAO.UploadVertexData(sizeof(vertices), vertices, 4);
+    VAO.UploadIndexData(sizeof(indices), indices, 6);
 
-    Buffer EBO(GL_ELEMENT_ARRAY_BUFFER);
-    EBO.UploadBufferData(sizeof(indices), indices, 4);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glBindVertexArray(0);
-
+    ShaderProgram shaders(RESOURCES_PATH "shaders/basicVertex.shader", RESOURCES_PATH "shaders/basicFrag.shader");
 
     while (m_Running)
     {
@@ -147,8 +142,7 @@ void RenderToy::Application::Run()
 
         // draw our first triangle
         shaders.Use();
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        VAO.Draw();
 
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
