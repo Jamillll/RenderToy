@@ -78,15 +78,16 @@ void RenderToy::Application::Run()
         0, 1, 3,  // first Triangle
         1, 2, 3   // second Triangle
     };
+
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     Buffer VBO(GL_ARRAY_BUFFER);
-    VBO.UploadBufferData(sizeof(vertices), vertices, GL_STATIC_DRAW);
+    VBO.UploadBufferData(sizeof(vertices), vertices, 6);
 
     Buffer EBO(GL_ELEMENT_ARRAY_BUFFER);
-    EBO.UploadBufferData(sizeof(indices), indices, GL_STATIC_DRAW);
+    EBO.UploadBufferData(sizeof(indices), indices, 4);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
