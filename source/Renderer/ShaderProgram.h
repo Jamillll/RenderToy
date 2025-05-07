@@ -13,7 +13,7 @@ namespace RenderToy
 		ShaderProgram(const std::string& CombinedShaderPath);
 		ShaderProgram(const std::string& VertexShaderPath, const std::string& FragmentShaderPath);
 
-		void InitialiseShaders(const std::string& VertexShaderPath, const std::string& FragmentShaderPath);
+		void CreateShaders(const std::string& VertexShaderPath, const std::string& FragmentShaderPath);
 
 		uint32_t GetID();
 

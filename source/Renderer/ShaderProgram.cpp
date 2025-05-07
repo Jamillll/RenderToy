@@ -33,10 +33,10 @@ namespace RenderToy
 
 	ShaderProgram::ShaderProgram(const std::string& VertexShaderPath, const std::string& FragmentShaderPath)
 	{
-		InitialiseShaders(VertexShaderPath, FragmentShaderPath);
+		CreateShaders(VertexShaderPath, FragmentShaderPath);
 	}
 
-	void ShaderProgram::InitialiseShaders(const std::string& VertexShaderPath, const std::string& FragmentShaderPath)
+	void ShaderProgram::CreateShaders(const std::string& VertexShaderPath, const std::string& FragmentShaderPath)
 	{
 		m_ID = glCreateProgram();
 		glAttachShader(m_ID, ParseShader(VertexShaderPath, GL_VERTEX_SHADER));
