@@ -10,6 +10,7 @@
 #include "renderer/BufferLayout.h"
 #include "renderer/Framebuffer.h"
 #include "renderer/Camera.h"
+#include "renderer/Texture.h"
 
 #include "renderer/Renderer.h"
 
@@ -86,7 +87,7 @@ namespace RenderToy
             -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
              10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
              10.5f,  10.5f,  10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 1.0f, 0.0f,
+             10.5f,  10.5f,  10.5f,  1.0f, 1.0f, 0.0f, 
             -10.5f,  10.5f,  10.5f,  0.0f, 1.0f, 0.0f,
             -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
                                
@@ -103,14 +104,14 @@ namespace RenderToy
              10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
              10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
              10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-                                              
+                                               
             -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
              10.5f, -10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
              10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
              10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
             -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
             -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-                                              
+                                               
             -10.5f,  10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
              10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
              10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
@@ -169,11 +170,10 @@ namespace RenderToy
             // main
             {
                 ImGui::Begin("Main");
+                Renderer::StartFrame();
 
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
                 ImVec2 position = ImGui::GetCursorScreenPos();
-
-                Renderer::StartFrame();
 
                 Camera* camera = Renderer::GetCamera();
                 camera->SetAspectRatio(windowSize.x, windowSize.y);

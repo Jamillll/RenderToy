@@ -51,7 +51,7 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/glad/inc
 # GLM
 target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/)
 # Vendor
-target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/include)
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/)
 
 
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE opengl32 glfw3 ImGui)
