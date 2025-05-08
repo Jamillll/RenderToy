@@ -9,7 +9,7 @@ namespace RenderToy
 		float farPlane = 100.0f;
 		m_Projection = glm::perspective(glm::radians(m_Fov), aspectRatio, nearPlane, farPlane);
 
-		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Position + m_Up);
+		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
 
 	glm::mat4 Camera::GenerateMVPMatrix(glm::vec3 position, float rotation, glm::vec3 pointOfRotation)
@@ -29,6 +29,13 @@ namespace RenderToy
 	void Camera::SetPosition(glm::vec3 newPosition)
 	{
 		m_Position = newPosition;
+		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
+	}
+
+	void Camera::IncreasePosition(glm::vec3 increaseBy)
+	{
+		m_Position += increaseBy;
+		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
 
 	void Camera::SetAspectRatio(float width, float height)

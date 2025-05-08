@@ -72,14 +72,60 @@ namespace RenderToy
         // set up vertex data (and buffer(s)) and configure vertex attributes
         // ------------------------------------------------------------------
         float vertices[] = {
-             0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f,  // top right
-             0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,  // bottom right
-            -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,  // bottom left
-            -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f   // top left 
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
+                                              
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+                                              
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+                                              
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+                                              
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+                                              
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f
         };
-        unsigned int indices[] = {  // note that we start from 0!
-            0, 1, 3,  // first Triangle
-            1, 2, 3   // second Triangle
+
+        glm::vec3 cubePositions[] = {
+            glm::vec3(0.0f,  0.0f,  0.0f),
+            glm::vec3(2.0f,  5.0f, -15.0f),
+            glm::vec3(-1.5f, -2.2f, -2.5f),
+            glm::vec3(-3.8f, -2.0f, -12.3f),
+            glm::vec3(2.4f, -0.4f, -3.5f),
+            glm::vec3(-1.7f,  3.0f, -7.5f),
+            glm::vec3(1.3f, -2.0f, -2.5f),
+            glm::vec3(1.5f,  2.0f, -2.5f),
+            glm::vec3(1.5f,  0.2f, -1.5f),
+            glm::vec3(-1.3f,  1.0f, -1.5f)
         };
 
         BufferLayout layout =
@@ -89,9 +135,7 @@ namespace RenderToy
         };
 
         VertexArray VAO(layout);
-        VAO.AddIndexBuffer();
-        VAO.UploadVertexData(sizeof(vertices), vertices, 4);
-        VAO.UploadIndexData(sizeof(indices), indices, 6);
+        VAO.UploadVertexData(sizeof(vertices), vertices, 36);
 
         Camera camera(1280, 720);
 
@@ -135,13 +179,18 @@ namespace RenderToy
                 framebuffer.Bind();
                 framebuffer.Clear();
 
-                shaders.Use();
-
                 camera.SetAspectRatio(windowSize.x, windowSize.y);
-                glm::mat4 mvp = camera.GenerateMVPMatrix(glm::vec3(0, 0, 0), 45);
-                shaders.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
 
-                VAO.Draw();
+                for (size_t i = 0; i < 10; i++)
+                {
+                    float angle = 20.0f * i;
+
+                    shaders.Use();
+
+                    glm::mat4 mvp = camera.GenerateMVPMatrix(cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
+                    shaders.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
+                    VAO.Draw();
+                }
 
                 framebuffer.Unbind();
                 glDisable(GL_DEPTH_TEST);
@@ -166,9 +215,15 @@ namespace RenderToy
             // Sidebar
             {
                 ImGui::Begin("Sidebar");
-
-                ImGui::Text("This is some useful text.");
                 ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
+                glm::vec3 cameraPosition = camera.GetPosition();
+
+                ImGui::SliderFloat("Camera X", &cameraPosition.x, -10.0f, 10.0f);
+                ImGui::SliderFloat("Camera Y", &cameraPosition.y, -10.0f, 10.0f);
+                ImGui::SliderFloat("Camera Z", &cameraPosition.z, -10.0f, 10.0f);
+                camera.SetPosition(cameraPosition);
+
                 ImGui::End();
             }
 

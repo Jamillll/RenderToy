@@ -19,10 +19,11 @@ namespace RenderToy
 	public:
 		Camera(float windowWidth, float windowHeight);
 
-		glm::mat4 GenerateMVPMatrix(glm::vec3 position, float rotation, glm::vec3 pointOfRotation = glm::vec3(0.0, 0.0, 1.0));
+		glm::mat4 GenerateMVPMatrix(glm::vec3 position, float rotation = 0, glm::vec3 pointOfRotation = glm::vec3(0.0, 0.0, 1.0));
 
 		glm::vec3 GetPosition();
-		void SetPosition(glm::vec3 newPosition);
+		void SetPosition(glm::vec3 position);
+		void IncreasePosition(glm::vec3 increaseBy);
 
 		void SetAspectRatio(float width, float height);
 
