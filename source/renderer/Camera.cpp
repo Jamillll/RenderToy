@@ -6,7 +6,7 @@ namespace RenderToy
 	{
 		float aspectRatio = windowWidth / windowHeight;
 		float nearPlane = 0.1f;
-		float farPlane = 100.0f;
+		float farPlane = 500.0f;
 		m_Projection = glm::perspective(glm::radians(m_Fov), aspectRatio, nearPlane, farPlane);
 
 		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
@@ -42,7 +42,7 @@ namespace RenderToy
 	{
 		float aspectRatio = width / height;
 		float nearPlane = 0.1f;
-		float farPlane = 100.0f;
+		float farPlane = 500.0f;
 		m_Projection = glm::perspective(glm::radians(m_Fov), aspectRatio, nearPlane, farPlane);
 	}
 

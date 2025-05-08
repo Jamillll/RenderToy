@@ -9,7 +9,7 @@ namespace RenderToy
 	class Camera
 	{
 	private:
-		glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 3.0f);
+		glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 100.0f);
 		glm::vec3 m_Front = glm::vec3(0.0f, 0.0f, -1.0f);
 		glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		float m_Fov = 65.0f;
