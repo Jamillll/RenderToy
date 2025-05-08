@@ -3,34 +3,10 @@
 
 namespace RenderToy
 {
-	Framebuffer::Framebuffer()
+	Framebuffer::Framebuffer(float width, float height) :
+		m_Width(width), m_Height(height)
 	{
-		m_Shaders.CreateShaders(RESOURCES_PATH "shaders/fbVertex.shader", RESOURCES_PATH "shaders/fbFragment.shader");
-
-		InitialiseVAO();
-
-		glGenFramebuffers(1, &m_fbo);
-		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-		glGenTextures(1, &m_FramebufferTexture);
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D, m_FramebufferTexture);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1280, 720, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FramebufferTexture, 0);
-
-		glGenRenderbuffers(1, &m_rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
-
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1280, 720);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
-
-		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE && "FrameBuffer incomplete");
+		InitialiseFrameBuffer();
 	}
 
 	void Framebuffer::Bind()
@@ -53,10 +29,17 @@ namespace RenderToy
 	void Framebuffer::Render()
 	{
 		m_Shaders.Use();
-		glActiveTexture(0);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_FramebufferTexture);
 		m_Shaders.setI1Uniform("u_FramebufferTexture", 0);
+
 		m_OutputQuad->Draw();
+	}
+
+
+	void Framebuffer::SetSize(float width, float height)
+	{
+		InitialiseFrameBuffer();
 	}
 
 	uint32_t Framebuffer::GetFramebufferTextureID()
@@ -66,6 +49,38 @@ namespace RenderToy
 
 	Framebuffer::~Framebuffer()
 	{
+	}
+
+	void Framebuffer::InitialiseFrameBuffer()
+	{
+		// Framebuffer Shaders 
+		m_Shaders.CreateShaders(RESOURCES_PATH "shaders/fbVertex.shader", RESOURCES_PATH "shaders/fbFragment.shader");
+
+		// VAO for the screen quad
+		InitialiseVAO();
+
+		glGenFramebuffers(1, &m_fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+		glGenTextures(1, &m_FramebufferTexture);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_FramebufferTexture);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_Width, m_Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FramebufferTexture, 0);
+
+		glGenRenderbuffers(1, &m_rbo);
+		glBindRenderbuffer(GL_RENDERBUFFER, m_rbo);
+
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_Width, m_Height);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
+
+		assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE && "FrameBuffer incomplete");
 	}
 
 	void Framebuffer::InitialiseVAO()

@@ -9,6 +9,7 @@
 #include "Renderer/VertexArray.h"
 #include "Renderer/BufferLayout.h"
 #include "Renderer/Framebuffer.h"
+#include "Renderer/Camera.h"
 
 namespace RenderToy
 {
@@ -92,8 +93,11 @@ namespace RenderToy
         VAO.UploadVertexData(sizeof(vertices), vertices, 4);
         VAO.UploadIndexData(sizeof(indices), indices, 6);
 
+        Camera camera(1280, 720);
+
         ShaderProgram shaders(RESOURCES_PATH "shaders/basicCombined.shader");
-        Framebuffer framebuffer;
+
+        Framebuffer framebuffer(1280, 720);
 
         while (m_Running)
         {
@@ -118,23 +122,29 @@ namespace RenderToy
             if (m_State.showDemoWindow)
                 ImGui::ShowDemoWindow(&m_State.showDemoWindow);
 
-            // Render Here
-            glEnable(GL_DEPTH_TEST);
-            framebuffer.Bind();
-            framebuffer.Clear();
-
-            shaders.Use();
-            VAO.Draw();
-
-            framebuffer.Unbind();
-            glDisable(GL_DEPTH_TEST);
-
             // main
             {
                 ImGui::Begin("Main");
 
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
                 ImVec2 position = ImGui::GetCursorScreenPos();
+
+                // Render Here
+                glEnable(GL_DEPTH_TEST);
+                framebuffer.SetSize(windowSize.x, windowSize.y);
+                framebuffer.Bind();
+                framebuffer.Clear();
+
+                shaders.Use();
+
+                camera.SetAspectRatio(windowSize.x, windowSize.y);
+                glm::mat4 mvp = camera.GenerateMVPMatrix(glm::vec3(0, 0, 0), 45);
+                shaders.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
+
+                VAO.Draw();
+
+                framebuffer.Unbind();
+                glDisable(GL_DEPTH_TEST);
 
                 // The first parameter of the Add image function takes an OpenGL image ID
                 // The second and third parameters define the size of the image, 

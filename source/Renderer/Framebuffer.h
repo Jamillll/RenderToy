@@ -16,8 +16,10 @@ namespace RenderToy
 		ShaderProgram m_Shaders;
 		std::unique_ptr<VertexArray> m_OutputQuad = nullptr;
 
+		float m_Width, m_Height;
+
 	public:
-		Framebuffer();
+		Framebuffer(float width, float height);
 
 		void Bind();
 		void Unbind();
@@ -25,11 +27,13 @@ namespace RenderToy
 		void Clear();
 		void Render();
 
+		void SetSize(float width, float height);
 		uint32_t GetFramebufferTextureID();
 
 		~Framebuffer();
 
 	private:
+		void InitialiseFrameBuffer();
 		void InitialiseVAO();
 	};
 }

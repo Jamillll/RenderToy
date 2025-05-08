@@ -1,17 +1,21 @@
 #include "Renderer.h"
 
-void RenderToy::Renderer::Initialise()
+namespace RenderToy
 {
-}
+	void Renderer::Initialise()
+	{
+	}
 
-void RenderToy::Renderer::Submit()
-{
-}
+	void Renderer::Submit()
+	{
+	}
 
-void RenderToy::Renderer::StartFrame()
-{
-}
+	void Renderer::StartFrame()
+	{
+	}
 
-void RenderToy::Renderer::EndFrame()
-{
+	void Renderer::EndFrame()
+	{
+	}
+
 }
