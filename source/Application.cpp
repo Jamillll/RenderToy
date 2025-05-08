@@ -4,12 +4,14 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
-#include "Renderer/ShaderProgram.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/VertexArray.h"
-#include "Renderer/BufferLayout.h"
-#include "Renderer/Framebuffer.h"
-#include "Renderer/Camera.h"
+#include "renderer/ShaderProgram.h"
+#include "renderer/Buffer.h"
+#include "renderer/VertexArray.h"
+#include "renderer/BufferLayout.h"
+#include "renderer/Framebuffer.h"
+#include "renderer/Camera.h"
+
+#include "renderer/Renderer.h"
 
 namespace RenderToy
 {
@@ -58,6 +60,8 @@ namespace RenderToy
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(m_Window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
+
+        Renderer::Initialise(1280, 720);
 
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -137,11 +141,7 @@ namespace RenderToy
         VertexArray VAO(layout);
         VAO.UploadVertexData(sizeof(vertices), vertices, 36);
 
-        Camera camera(1280, 720);
-
         ShaderProgram shaders(RESOURCES_PATH "shaders/basicCombined.shader");
-
-        Framebuffer framebuffer(1280, 720);
 
         while (m_Running)
         {
@@ -173,27 +173,19 @@ namespace RenderToy
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
                 ImVec2 position = ImGui::GetCursorScreenPos();
 
-                // Render Here
-                glEnable(GL_DEPTH_TEST);
-                framebuffer.SetSize(windowSize.x, windowSize.y);
-                framebuffer.Bind();
-                framebuffer.Clear();
+                Renderer::StartFrame();
 
-                camera.SetAspectRatio(windowSize.x, windowSize.y);
+                Camera* camera = Renderer::GetCamera();
+                camera->SetAspectRatio(windowSize.x, windowSize.y);
 
                 for (size_t i = 0; i < 10; i++)
                 {
                     float angle = 20.0f * i;
 
-                    shaders.Use();
-
-                    glm::mat4 mvp = camera.GenerateMVPMatrix(cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
-                    shaders.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
-                    VAO.Draw();
+                    Renderer::Submit(VAO, shaders, cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
                 }
 
-                framebuffer.Unbind();
-                glDisable(GL_DEPTH_TEST);
+                Renderer::EndFrame();
 
                 // The first parameter of the Add image function takes an OpenGL image ID
                 // The second and third parameters define the size of the image, 
@@ -202,12 +194,11 @@ namespace RenderToy
                 // (we're setting the same ones as openGL here)
 
                 ImGui::GetWindowDrawList()->AddImage(
-                    framebuffer.GetFramebufferTextureID(),
+                    Renderer::GetFramebufferTextureID() ,
                     ImVec2(position.x, position.y),
                     ImVec2(position.x + windowSize.x, position.y + windowSize.y),
                     ImVec2(0, 1),
-                    ImVec2(1, 0)
-                );
+                    ImVec2(1, 0));
 
                 ImGui::End();
             }
@@ -215,14 +206,16 @@ namespace RenderToy
             // Sidebar
             {
                 ImGui::Begin("Sidebar");
-                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+                ImGui::Text("%.1f FPS (%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
 
-                glm::vec3 cameraPosition = camera.GetPosition();
+                Camera* camera = Renderer::GetCamera();
+
+                glm::vec3 cameraPosition = camera->GetPosition();
 
                 ImGui::SliderFloat("Camera X", &cameraPosition.x, -200.0f, 200.0f);
                 ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
                 ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
-                camera.SetPosition(cameraPosition);
+                camera->SetPosition(cameraPosition);
 
                 ImGui::End();
             }

@@ -39,6 +39,12 @@ namespace RenderToy
 
 	void Framebuffer::SetSize(float width, float height)
 	{
+		m_Width = width;
+		m_Height = height;
+
+		glDeleteTextures(1, &m_FramebufferTexture);
+		glDeleteRenderbuffers(1, &m_rbo);
+		glDeleteFramebuffers(1, &m_fbo);
 		InitialiseFrameBuffer();
 	}
 
