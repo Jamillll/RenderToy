@@ -10,7 +10,6 @@
 #include "renderer/BufferLayout.h"
 #include "renderer/Framebuffer.h"
 #include "renderer/Camera.h"
-#include "renderer/Texture.h"
 
 #include "renderer/Renderer.h"
 

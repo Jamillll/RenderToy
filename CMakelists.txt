@@ -48,10 +48,15 @@ target_include_directories("ImGui" PUBLIC ${IMGUI_PATH})
 target_include_directories("ImGui" PRIVATE dependencies/glfw/include)
 # GLAD
 target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/glad/include)
+# assimp
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/assimp/include)
+target_link_directories("${CMAKE_PROJECT_NAME}" PRIVATE dependencies/assimp/lib/x64)
+# Copy the dll binary to the output directory
+file(COPY dependencies/assimp/lib/x64/assimp-vc143-mt.dll DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 # GLM
 target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/)
 # Vendor
 target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE vendor/)
 
 
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE opengl32 glfw3 ImGui)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE opengl32 glfw3 ImGui assimp-vc143-mt)
