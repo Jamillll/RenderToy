@@ -5,30 +5,32 @@
 
 namespace RenderToy
 {
+	typedef unsigned int AssetHandle;
+
 	enum AssetType
 	{
 		NULLASSET = 0,
-		TEXTURE = 1,
-		MODEL = 2,
+		MODEL = 1,
 	};
 
 	class Asset
 	{
 	public:
-		unsigned int AssetHandle = 0;
-		AssetType AssetType = AssetType::NULLASSET;
+		AssetHandle assetHandle = 0;
+		AssetType assetType = AssetType::NULLASSET;
 	};
 	
 	class AssetManager
 	{
 	private:
-		std::vector<std::unique_ptr<Asset>> m_Assets;
+		static std::vector<std::unique_ptr<Asset>> m_Assets;
 
 	public:
-		AssetManager();
+		static void Initialise();
 
-		void CreateTexture(const std::string& path, bool flipped = false);
-		void CreateModel(const std::string& path, bool flipped = false);
+		static void CreateModel(const std::string& path);
+
+		static Asset* GetAssetByHandle(AssetHandle handle);
 	};
 
 }

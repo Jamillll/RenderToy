@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include <glad/glad.h>
 
+#include "../Assets/Model.h"
+
 namespace RenderToy
 {
 	std::unique_ptr<Framebuffer> Renderer::m_Framebuffer = nullptr;
@@ -10,6 +12,21 @@ namespace RenderToy
 	{
 		m_Camera = std::make_unique<Camera>(windowWidth, windowHeight);
 		m_Framebuffer = std::make_unique<Framebuffer>(windowWidth, windowHeight);
+	}
+
+	void Renderer::Submit(AssetHandle assethandle, ShaderProgram shaders, glm::vec3 position, float rotation, glm::vec3 pointOfRotation)
+	{
+		Asset* asset = AssetManager::GetAssetByHandle(assethandle);
+
+		switch (asset->assetType)
+		{
+		case AssetType::NULLASSET:
+			return;
+
+		case AssetType::MODEL:
+			Model* model = (Model*)asset;
+			model->Draw(shaders, *m_Camera);
+		}
 	}
 
 	void Renderer::Submit(VertexArray& vao, ShaderProgram shaders, glm::vec3 position, float rotation, glm::vec3 pointOfRotation)

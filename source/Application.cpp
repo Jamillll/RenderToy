@@ -4,14 +4,15 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
-#include "renderer/ShaderProgram.h"
-#include "renderer/Buffer.h"
-#include "renderer/VertexArray.h"
-#include "renderer/BufferLayout.h"
-#include "renderer/Framebuffer.h"
-#include "renderer/Camera.h"
+#include "Renderer/ShaderProgram.h"
+#include "Renderer/Buffer.h"
+#include "Renderer/VertexArray.h"
+#include "Renderer/BufferLayout.h"
+#include "Renderer/Framebuffer.h"
+#include "Renderer/Camera.h"
 
-#include "renderer/Renderer.h"
+#include "Renderer/Renderer.h"
+#include "Assets/AssetManager.h"
 
 namespace RenderToy
 {
@@ -62,6 +63,7 @@ namespace RenderToy
         ImGui_ImplOpenGL3_Init(glsl_version);
 
         Renderer::Initialise(1280, 720);
+        AssetManager::Initialise();
 
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -142,6 +144,9 @@ namespace RenderToy
         VAO.UploadVertexData(sizeof(vertices), vertices, 36);
 
         ShaderProgram shaders(RESOURCES_PATH "shaders/basicCombined.shader");
+        ShaderProgram modelShaders(RESOURCES_PATH "shaders/modelCombined.shader");
+
+        AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
 
         while (m_Running)
         {
@@ -181,8 +186,10 @@ namespace RenderToy
                 {
                     float angle = 20.0f * i;
 
-                    Renderer::Submit(VAO, shaders, cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
+                    //Renderer::Submit(VAO, shaders, cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
                 }
+
+                Renderer::Submit(1, modelShaders, glm::vec3(0, 0, 0));
 
                 Renderer::EndFrame();
 

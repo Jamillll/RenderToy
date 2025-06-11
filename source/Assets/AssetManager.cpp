@@ -1,24 +1,32 @@
 #include "AssetManager.h"
 #include "Texture.h"
+#include "Model.h"
 
 namespace RenderToy
 {
-	AssetManager::AssetManager()
+	std::vector<std::unique_ptr<Asset>> AssetManager::m_Assets;
+
+	void AssetManager::Initialise()
 	{
 		// Creating a null asset which can be returned in the event of errors
 		std::unique_ptr<Asset> nullAsset = std::make_unique<Asset>();
-		nullAsset->AssetType = AssetType::NULLASSET;
-		nullAsset->AssetHandle = 0;
+		nullAsset->assetType = AssetType::NULLASSET;
+		nullAsset->assetHandle = 0;
 
 		m_Assets.push_back(std::move(nullAsset));
 	}
 
-	void AssetManager::CreateTexture(const std::string& path, bool flipped)
+	void AssetManager::CreateModel(const std::string& path)
 	{
-		std::unique_ptr<Texture> texture = std::make_unique<Texture>(path, flipped);
-		texture->AssetHandle = m_Assets.size();
-		texture->AssetType = AssetType::TEXTURE;
+		std::unique_ptr<Model> model = std::make_unique<Model>(path);
+		model->assetHandle = m_Assets.size();
+		model->assetType = AssetType::MODEL;
 
-		m_Assets.push_back(std::move(texture));
+		m_Assets.push_back(std::move(model));
+	}
+
+	Asset* AssetManager::GetAssetByHandle(AssetHandle handle)
+	{
+		return m_Assets[handle].get();
 	}
 }

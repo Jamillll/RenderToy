@@ -4,7 +4,7 @@
 
 namespace RenderToy
 {
-	class Texture : public Asset
+	class Texture
 	{
 	private:
 		uint32_t m_ID;

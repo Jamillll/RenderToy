@@ -10,7 +10,7 @@
 
 namespace RenderToy
 {
-	class Model
+	class Model : public Asset
 	{
 	private:
 		std::vector<Mesh> m_Meshes;
@@ -25,6 +25,6 @@ namespace RenderToy
 		void LoadModel(std::string path);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<StrippedTexture> LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName);
+		std::vector<Texture> LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName);
 	};
 }
