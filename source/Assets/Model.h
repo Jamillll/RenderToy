@@ -1,12 +1,10 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "../Renderer/ShaderProgram.h"
+#include "../Renderer/Renderer.h"
 #include "Mesh.h"
 
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 namespace RenderToy
 {
@@ -19,7 +17,7 @@ namespace RenderToy
 
 	public:
 		Model(std::string path);
-		void Draw(ShaderProgram shader, Camera& camera);
+		void Draw(ShaderProgram shader, Camera& camera, TransformData transform);
 
 	private:
 		void LoadModel(std::string path);

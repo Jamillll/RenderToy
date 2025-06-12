@@ -6,6 +6,20 @@
 
 namespace RenderToy
 {
+	struct TransformData
+	{
+		glm::vec3 Position;
+		glm::vec3 Scale;
+		float Rotation;
+		glm::vec3 PointOfRotation;
+
+		TransformData(
+			glm::vec3 position = {0, 0, 0},
+			glm::vec3 scale = {1, 1, 1},
+			float rotation = 0,
+			glm::vec3 pointOfRotation = {0, 0, 1});
+	};
+
 	class Camera
 	{
 	private:
@@ -19,7 +33,7 @@ namespace RenderToy
 	public:
 		Camera(float windowWidth, float windowHeight);
 
-		glm::mat4 GenerateMVPMatrix(glm::vec3 position, float rotation = 0, glm::vec3 pointOfRotation = glm::vec3(0.0, 0.0, 1.0));
+		glm::mat4 GenerateMVPMatrix(TransformData transform);
 
 		glm::vec3 GetPosition();
 		void SetPosition(glm::vec3 position);

@@ -148,6 +148,11 @@ namespace RenderToy
 
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
 
+        float position[3] = { 0, 0, 0 };
+        float scale[3] = { 10, 10, 10 };
+        float rotation = 0;
+        float pointOfRotation[3] = { 0, 0, 1 };
+
         while (m_Running)
         {
             if (glfwWindowShouldClose(m_Window)) m_Running = false;
@@ -177,7 +182,7 @@ namespace RenderToy
                 Renderer::StartFrame();
 
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
-                ImVec2 position = ImGui::GetCursorScreenPos();
+                ImVec2 windowPosition = ImGui::GetCursorScreenPos();
 
                 Camera* camera = Renderer::GetCamera();
                 camera->SetAspectRatio(windowSize.x, windowSize.y);
@@ -186,10 +191,18 @@ namespace RenderToy
                 {
                     float angle = 20.0f * i;
 
-                    //Renderer::Submit(VAO, shaders, cubePositions[i], angle, glm::vec3(0.5f, 1.0f, 0.0f));
+                    Renderer::Submit(VAO, shaders, TransformData(cubePositions[i], {1, 1, 1}, angle, { 0.5f, 1.0f, 0.0f }));
                 }
 
-                Renderer::Submit(1, modelShaders, glm::vec3(0, 0, 0));
+                TransformData backpackTransform =
+                {
+                    {position[0], position[1], position[2]},
+                    {scale[0], scale[1], scale[2]},
+                    rotation,
+                    {pointOfRotation[0], pointOfRotation[1], pointOfRotation[2]}
+                };
+
+                Renderer::Submit(1, modelShaders, backpackTransform);
 
                 Renderer::EndFrame();
 
@@ -201,8 +214,8 @@ namespace RenderToy
 
                 ImGui::GetWindowDrawList()->AddImage(
                     Renderer::GetFramebufferTextureID() ,
-                    ImVec2(position.x, position.y),
-                    ImVec2(position.x + windowSize.x, position.y + windowSize.y),
+                    ImVec2(windowPosition.x, windowPosition.y),
+                    ImVec2(windowPosition.x + windowSize.x, windowPosition.y + windowSize.y),
                     ImVec2(0, 1),
                     ImVec2(1, 0));
 
@@ -218,10 +231,19 @@ namespace RenderToy
 
                 glm::vec3 cameraPosition = camera->GetPosition();
 
+                ImGui::SeparatorText("Camera Transform");
+
                 ImGui::SliderFloat("Camera X", &cameraPosition.x, -200.0f, 200.0f);
                 ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
                 ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
                 camera->SetPosition(cameraPosition);
+
+                ImGui::SeparatorText("Backpack Transform");
+
+                ImGui::InputFloat3("Position", position);
+                ImGui::InputFloat3("scale", scale);
+                ImGui::InputFloat("rotation", &rotation);
+                ImGui::InputFloat3("Point of rotation", pointOfRotation);
 
                 ImGui::End();
             }

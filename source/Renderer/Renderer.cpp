@@ -14,7 +14,7 @@ namespace RenderToy
 		m_Framebuffer = std::make_unique<Framebuffer>(windowWidth, windowHeight);
 	}
 
-	void Renderer::Submit(AssetHandle assethandle, ShaderProgram shaders, glm::vec3 position, float rotation, glm::vec3 pointOfRotation)
+	void Renderer::Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform)
 	{
 		Asset* asset = AssetManager::GetAssetByHandle(assethandle);
 
@@ -25,15 +25,15 @@ namespace RenderToy
 
 		case AssetType::MODEL:
 			Model* model = (Model*)asset;
-			model->Draw(shaders, *m_Camera);
+			model->Draw(shaders, *m_Camera, transform);
 		}
 	}
 
-	void Renderer::Submit(VertexArray& vao, ShaderProgram shaders, glm::vec3 position, float rotation, glm::vec3 pointOfRotation)
+	void Renderer::Submit(VertexArray& vao, ShaderProgram shaders, TransformData transform)
 	{
 		shaders.Use();
 
-		glm::mat4 mvp = m_Camera->GenerateMVPMatrix(position, rotation, pointOfRotation);
+		glm::mat4 mvp = m_Camera->GenerateMVPMatrix(transform);
 		shaders.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
 		vao.Draw();
 	}

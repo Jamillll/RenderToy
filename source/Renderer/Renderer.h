@@ -21,8 +21,8 @@ namespace RenderToy
 	public:
 		static void Initialise(float windowWidth, float windowHeight);
 
-		static void Submit(AssetHandle assethandle, ShaderProgram shaders, glm::vec3 position, float rotation = 0, glm::vec3 pointOfRotation = { 0, 0, 0 });
-		static void Submit(VertexArray& vao, ShaderProgram shaders, glm::vec3 position, float rotation = 0, glm::vec3 pointOfRotation = { 0, 0, 0 });
+		static void Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform);
+		static void Submit(VertexArray& vao, ShaderProgram shaders, TransformData transform);
 		
 		static Camera* GetCamera();
 		static uint32_t GetFramebufferTextureID();

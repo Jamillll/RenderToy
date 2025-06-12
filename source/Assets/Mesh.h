@@ -3,11 +3,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include <vector>
+#include <memory>
 
-#include "../Renderer/ShaderProgram.h"
+#include "../Renderer/Renderer.h"
 #include "Texture.h"
-#include "../Renderer/Camera.h"
-#include "../Renderer/VertexArray.h"
 
 namespace RenderToy
 {
@@ -21,7 +20,7 @@ namespace RenderToy
 	class Mesh
 	{
 	private:
-		VertexArray* m_VAO = nullptr;
+		std::unique_ptr<VertexArray> m_VAO = nullptr;
 		uint32_t m_VBO;
 		uint32_t m_EBO;
 
@@ -31,7 +30,7 @@ namespace RenderToy
 		std::vector<Texture> Textures;
 
 		Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
-		void Draw(ShaderProgram shader, Camera& camera);
+		void Draw(ShaderProgram shader, Camera& camera, TransformData transform);
 
 	private:
 		void SetupMesh();

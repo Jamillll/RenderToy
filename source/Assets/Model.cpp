@@ -1,5 +1,7 @@
 #include "Model.h"
 #include <iostream>
+#include <assimp/postprocess.h>
+#include <assimp/Importer.hpp>
 
 namespace RenderToy
 {
@@ -8,11 +10,11 @@ namespace RenderToy
 		LoadModel(path);
 	}
 
-	void Model::Draw(ShaderProgram shader, Camera& camera)
+	void Model::Draw(ShaderProgram shader, Camera& camera, TransformData transform)
 	{
 		for (size_t i = 0; i < m_Meshes.size(); i++)
 		{
-			m_Meshes[i].Draw(shader, camera);
+			m_Meshes[i].Draw(shader, camera, transform);
 		}
 	}
 

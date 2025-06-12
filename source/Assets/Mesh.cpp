@@ -13,14 +13,14 @@ namespace RenderToy
 		SetupMesh();
 	}
 
-	void Mesh::Draw(ShaderProgram shader, Camera& camera)
+	void Mesh::Draw(ShaderProgram shader, Camera& camera, TransformData transform)
 	{
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
 
 		shader.Use();
 
-		glm::mat4 mvp = camera.GenerateMVPMatrix(glm::vec3(0, 0, 0));
+		glm::mat4 mvp = camera.GenerateMVPMatrix(transform);
 		shader.setMat4Uniform("u_MVP", 1, false, glm::value_ptr(mvp));
 
 		for (size_t i = 0; i < Textures.size(); i++)
@@ -61,7 +61,8 @@ namespace RenderToy
 			{"TexCoords", ShaderDataType::Float2}
 		};
 
-		m_VAO = new VertexArray(layout);
+		m_VAO = std::make_unique<VertexArray>(layout);
+
 		m_VAO->UploadVertexData(sizeof(Vertex) * Vertices.size(), Vertices.data(), Vertices.size());
 
 		m_VAO->AddIndexBuffer();
