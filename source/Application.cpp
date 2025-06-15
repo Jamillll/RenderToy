@@ -68,12 +68,25 @@ namespace RenderToy
     {
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+        glm::vec3 cubePositions[] = {
+            glm::vec3(0.0f,  0.0f,  0.0f),
+            glm::vec3(20.0f,  50.0f, -150.0f),
+            glm::vec3(-10.5f, -20.2f, -20.5f),
+            glm::vec3(-30.8f, -20.0f, -120.3f),
+            glm::vec3(20.4f, -0.4f, -30.5f),
+            glm::vec3(-10.7f,  30.0f, -70.5f),
+            glm::vec3(10.3f, -20.0f, -20.5f),
+            glm::vec3(10.5f,  20.0f, -20.5f),
+            glm::vec3(10.5f,  00.2f, -10.5f),
+            glm::vec3(-10.3f,  10.0f, -10.5f)
+        };
+
         ShaderProgram modelShaders(RESOURCES_PATH "shaders/modelCombined.shader");
 
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
         AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
 
-        float position[3] = { 0, 0, 0 };
+        float position[3] = { 0, 0, 20 };
         float scale[3] = { 10, 10, 10 };
         float rotation = 0;
         float pointOfRotation[3] = { 0, 0, 1 };
@@ -101,9 +114,38 @@ namespace RenderToy
             if (m_State.showDemoWindow)
                 ImGui::ShowDemoWindow(&m_State.showDemoWindow);
 
-            // main
+            ImGui::BeginMainMenuBar();
+                if (ImGui::BeginMenu("File"))
+                {
+                    // TODO: Add actual functionality not just placeholders
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Edit"))
+                {
+                    // TODO: Add actual functionality not just placeholders
+
+                    if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+                    if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+                    if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+                    if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Help"))
+                {
+
+                    // TODO: Fill in
+
+                    ImGui::EndMenu();
+                }
+            ImGui::EndMainMenuBar();
+            
+
+            // Scene View
             {
-                ImGui::Begin("Main");
+                ImGui::Begin("Scene View");
                 Renderer::StartFrame();
 
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
@@ -147,9 +189,9 @@ namespace RenderToy
                 ImGui::End();
             }
 
-            // Sidebar
+            // Properties
             {
-                ImGui::Begin("Sidebar");
+                ImGui::Begin("Properties");
                 ImGui::Text("%.1f FPS (%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
 
                 Camera* camera = Renderer::GetCamera();
@@ -169,6 +211,20 @@ namespace RenderToy
                 ImGui::InputFloat3("scale", scale);
                 ImGui::InputFloat("rotation", &rotation);
                 ImGui::InputFloat3("Point of rotation", pointOfRotation);
+
+                ImGui::End();
+            }
+
+            // Asset Tray
+            {
+                ImGui::Begin("Asset Tray");
+
+                ImGui::End();
+            }
+
+            // Scene Hierarchy
+            {
+                ImGui::Begin("Scene Hierarchy");
 
                 ImGui::End();
             }
