@@ -16,7 +16,7 @@ namespace RenderToy
 	class Asset
 	{
 	public:
-		AssetHandle assetHandle = 0;
+		AssetHandle assetHandle = -1;
 		AssetType assetType = AssetType::NULLASSET;
 	};
 	

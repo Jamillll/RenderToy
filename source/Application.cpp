@@ -3,6 +3,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
+#include <iostream>
 
 #include "Renderer/Renderer.h"
 #include "Assets/AssetManager.h"
@@ -225,6 +226,23 @@ namespace RenderToy
             // Scene Hierarchy
             {
                 ImGui::Begin("Scene Hierarchy");
+
+                ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+                ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+                int node_clicked = -1;
+
+                for (size_t i = 1; i < 11; i++)
+                {
+                    if (ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i))
+                    {
+                        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                        {
+                            node_clicked = i;
+                            std::cout << node_clicked;
+                        }
+                    }
+                }
 
                 ImGui::End();
             }
