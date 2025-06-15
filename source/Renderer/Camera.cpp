@@ -15,9 +15,9 @@ namespace RenderToy
 	glm::mat4 Camera::GenerateMVPMatrix(TransformData transform)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::scale(model, transform.Scale);
-		model = glm::rotate(model, glm::radians(transform.Rotation), transform.PointOfRotation);
 		model = glm::translate(model, transform.Position);
+		model = glm::rotate(model, glm::radians(transform.Rotation), transform.PointOfRotation);
+		model = glm::scale(model, transform.Scale);
 
 		return m_Projection * m_View * model;
 	}

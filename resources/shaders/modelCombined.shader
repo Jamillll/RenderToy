@@ -25,5 +25,13 @@ uniform sampler2D texture_specular1;
 
 void main()
 {    
-    FragColor = texture(texture_diffuse1, TexCoords);
+    // Potential bug: A genuine texture coordinate is set to 0, 0
+    if (TexCoords != vec2(0, 0))
+    {
+        FragColor = texture(texture_diffuse1, TexCoords);
+    }
+    else
+    {
+        FragColor = vec4(1, 1, 1, 1); 
+    }
 }

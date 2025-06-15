@@ -13,7 +13,7 @@ namespace RenderToy
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
 
-		stbi_set_flip_vertically_on_load(flipped);
+		stbi_set_flip_vertically_on_load(true);
 
 		int width, height, nrchannels;
 		unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrchannels, 0);

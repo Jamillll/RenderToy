@@ -4,13 +4,6 @@
 #include "imgui_impl_opengl3.h"
 #include <stdio.h>
 
-#include "Renderer/ShaderProgram.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/VertexArray.h"
-#include "Renderer/BufferLayout.h"
-#include "Renderer/Framebuffer.h"
-#include "Renderer/Camera.h"
-
 #include "Renderer/Renderer.h"
 #include "Assets/AssetManager.h"
 
@@ -75,78 +68,10 @@ namespace RenderToy
     {
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-        // set up vertex data (and buffer(s)) and configure vertex attributes
-        // ------------------------------------------------------------------
-        float vertices[] = {
-            -10.5f, -10.5f, -10.5f,  0.0f, 0.0f, 0.0f,
-             10.5f, -10.5f, -10.5f,  1.0f, 0.0f, 0.0f,
-             10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-            -10.5f,  10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-            -10.5f, -10.5f, -10.5f,  0.0f, 0.0f, 0.0f,
-                               
-            -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-             10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 1.0f, 0.0f, 
-            -10.5f,  10.5f,  10.5f,  0.0f, 1.0f, 0.0f,
-            -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-                               
-            -10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-            -10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-            -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-            -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-            -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-            -10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-                               
-             10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-             10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-             10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-             10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-                                               
-            -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-             10.5f, -10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-             10.5f, -10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-            -10.5f, -10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-            -10.5f, -10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-                                               
-            -10.5f,  10.5f, -10.5f,  0.0f, 1.0f, 0.0f,
-             10.5f,  10.5f, -10.5f,  1.0f, 1.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-             10.5f,  10.5f,  10.5f,  1.0f, 0.0f, 0.0f,
-            -10.5f,  10.5f,  10.5f,  0.0f, 0.0f, 0.0f,
-            -10.5f,  10.5f, -10.5f,  0.0f, 1.0f, 0.0f
-        };
-
-        glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f,  0.0f,  0.0f),
-            glm::vec3(20.0f,  50.0f, -150.0f),
-            glm::vec3(-10.5f, -20.2f, -20.5f),
-            glm::vec3(-30.8f, -20.0f, -120.3f),
-            glm::vec3(20.4f, -0.4f, -30.5f),
-            glm::vec3(-10.7f,  30.0f, -70.5f),
-            glm::vec3(10.3f, -20.0f, -20.5f),
-            glm::vec3(10.5f,  20.0f, -20.5f),
-            glm::vec3(10.5f,  00.2f, -10.5f),
-            glm::vec3(-10.3f,  10.0f, -10.5f)
-        };
-
-        BufferLayout layout =
-        {
-            {"Position", ShaderDataType::Float3},
-            {"Colour", ShaderDataType::Float3}
-        };
-
-        VertexArray VAO(layout);
-        VAO.UploadVertexData(sizeof(vertices), vertices, 36);
-
-        ShaderProgram shaders(RESOURCES_PATH "shaders/basicCombined.shader");
         ShaderProgram modelShaders(RESOURCES_PATH "shaders/modelCombined.shader");
 
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
+        AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
 
         float position[3] = { 0, 0, 0 };
         float scale[3] = { 10, 10, 10 };
@@ -191,7 +116,7 @@ namespace RenderToy
                 {
                     float angle = 20.0f * i;
 
-                    Renderer::Submit(VAO, shaders, TransformData(cubePositions[i], {1, 1, 1}, angle, { 0.5f, 1.0f, 0.0f }));
+                    Renderer::Submit(2, modelShaders, TransformData(cubePositions[i], {5, 5, 5}, angle, { 0.5f, 1.0f, 0.0f }));
                 }
 
                 TransformData backpackTransform =
