@@ -4,10 +4,10 @@ namespace RenderToy
 {
 	Camera::Camera(float windowWidth, float windowHeight)
 	{
-		float aspectRatio = windowWidth / windowHeight;
+		m_AspectRatio = windowWidth / windowHeight;
 		float nearPlane = 0.1f;
 		float farPlane = 500.0f;
-		m_Projection = glm::perspective(glm::radians(m_Fov), aspectRatio, nearPlane, farPlane);
+		m_Projection = glm::perspective(glm::radians(m_Fov), m_AspectRatio, nearPlane, farPlane);
 
 		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
@@ -27,9 +27,36 @@ namespace RenderToy
 		return m_Position;
 	}
 
-	void Camera::SetPosition(glm::vec3 newPosition)
+	glm::vec3 Camera::GetFront()
 	{
-		m_Position = newPosition;
+		return m_Front;
+	}
+
+	glm::vec3 Camera::GetUp()
+	{
+		return m_Up;
+	}
+
+	float Camera::GetFov()
+	{
+		return m_Fov;
+	}
+
+	void Camera::SetFov(float fov)
+	{
+		m_Fov = fov;
+
+		float nearPlane = 0.1f;
+		float farPlane = 500.0f;
+		m_Projection = glm::perspective(glm::radians(m_Fov), m_AspectRatio, nearPlane, farPlane);
+	}
+
+	void Camera::SetPosition(glm::vec3 position, glm::vec3 front, glm::vec3 up)
+	{
+		m_Position = position;
+		m_Front = front;
+		m_Up = up;
+
 		m_View = glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 	}
 
@@ -41,10 +68,10 @@ namespace RenderToy
 
 	void Camera::SetAspectRatio(float width, float height)
 	{
-		float aspectRatio = width / height;
+		float m_AspectRatio = width / height;
 		float nearPlane = 0.1f;
 		float farPlane = 500.0f;
-		m_Projection = glm::perspective(glm::radians(m_Fov), aspectRatio, nearPlane, farPlane);
+		m_Projection = glm::perspective(glm::radians(m_Fov), m_AspectRatio, nearPlane, farPlane);
 	}
 
 	Camera::~Camera()

@@ -1,5 +1,7 @@
 #include "EntityManager.h"
 #include "Object.h"
+#include "../Renderer/Renderer.h"
+#include "CameraEntity.h"
 
 namespace RenderToy
 {
@@ -17,8 +19,13 @@ namespace RenderToy
 	void EntityManager::Initialise()
 	{
 		std::unique_ptr<Entity> nullEntity = std::make_unique<Entity>(0, EntityType::NULLENTITY);
-
 		m_Entities.push_back(std::move(nullEntity));
+
+		std::unique_ptr<Entity> camera = std::make_unique<CameraEntity>(Renderer::GetCamera());
+		camera->Handle = 1;
+		camera->Type = EntityType::CAMERA;
+		camera->Name = "Camera";
+		m_Entities.push_back(std::move(camera));
 	}
 
 	void EntityManager::CreateObject(EntityType type, AssetHandle model)

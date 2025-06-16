@@ -19,6 +19,7 @@ namespace RenderToy
 	{
 		NULLENTITY = 0,
 		OBJECT = 1,
+		CAMERA = 2,
 	};
 
 	class Entity

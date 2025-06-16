@@ -18,6 +18,7 @@ namespace RenderToy
 	public:
 		AssetHandle assetHandle = -1;
 		AssetType assetType = AssetType::NULLASSET;
+		std::string path;
 	};
 	
 	class AssetManager
@@ -31,6 +32,7 @@ namespace RenderToy
 		static void CreateModel(const std::string& path);
 
 		static Asset* GetAssetByHandle(AssetHandle handle);
+		static AssetHandle GetAssetByPath(const std::string& path);
 	};
 
 }

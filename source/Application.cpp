@@ -10,6 +10,7 @@
 #include "Assets/AssetManager.h"
 #include "Entities/EntityManager.h"
 #include "Entities/Object.h"
+#include "Entities/CameraEntity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -214,31 +215,57 @@ namespace RenderToy
             break;
 
         case EntityType::OBJECT:
+            {
+                Object* object = (Object*)selectedEntity;
 
-            Object* object = (Object*)selectedEntity;
+                ImGui::InputText("Name", &object->Name);
 
-            ImGui::InputText("Name", &object->Name);
+                TransformData* transform = object->GetTransformData();
+                ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
-            TransformData* transform = object->GetTransformData();
+                ImGui::Separator();
+                ImGui::Text("Position");
+                ImGui::PushItemWidth(windowSize.x * 0.3f);
+                ImGui::DragFloat("##position x", &transform->Position.x, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##position y", &transform->Position.y, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##position z", &transform->Position.z, 0.5f);
 
-            ImGui::InputFloat3("Position", glm::value_ptr(transform->Position));
-            ImGui::InputFloat3("scale", glm::value_ptr(transform->Scale));
-            ImGui::InputFloat("rotation", &transform->Rotation);
-            ImGui::InputFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation));
+                ImGui::Separator();
+                ImGui::Text("Scale");
+                ImGui::PushItemWidth(windowSize.x * 0.3f);
+                ImGui::DragFloat("##scale x", &transform->Scale.x, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##scale y", &transform->Scale.y, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##scale z", &transform->Scale.z, 0.5f);
 
+                ImGui::Separator();
+                ImGui::Text("Point of Rotation");
+                ImGui::PushItemWidth(windowSize.x * 0.3f);
+                ImGui::DragFloat("##por x", &transform->PointOfRotation.x, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##por y", &transform->PointOfRotation.y, 0.5f); ImGui::SameLine();
+                ImGui::DragFloat("##por z", &transform->PointOfRotation.z, 0.5f);
+
+                ImGui::Separator();
+                ImGui::Text("Rotation");
+                ImGui::SliderAngle("##slider angle", &transform->Rotation);
+            }
+            break;
+
+        case EntityType::CAMERA:
+            {
+                CameraEntity* camera = (CameraEntity*)selectedEntity;
+
+                ImGui::InputText("Name", &camera->Name);
+
+                ImGui::InputFloat3("Position", glm::value_ptr(camera->Position));
+                ImGui::InputFloat3("Front", glm::value_ptr(camera->Front));
+                ImGui::InputFloat3("Up", glm::value_ptr(camera->Up));
+                ImGui::InputFloat("Fov", &camera->Fov);
+
+                camera->UpdateCameraPosition();
+            }
+            
             break;
         }
-
-        Camera* camera = Renderer::GetCamera();
-
-        glm::vec3 cameraPosition = camera->GetPosition();
-
-        ImGui::SeparatorText("Camera Transform");
-
-        ImGui::SliderFloat("Camera X", &cameraPosition.x, -200.0f, 200.0f);
-        ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
-        ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
-        camera->SetPosition(cameraPosition);
 
         ImGui::End();
     }
@@ -289,11 +316,17 @@ namespace RenderToy
                 if (type + 1 == EntityType::OBJECT)
                 {
                     static std::string input;
-                    ImGui::InputText("Asset To Use (By Handle)", &input);
+                    ImGui::InputText("Asset To Use (By path)", &input);
 
                     if (ImGui::Button("Create Object", ImVec2(120, 0)))
                     {
-                        EntityManager::CreateObject(EntityType::OBJECT, std::stoi(input));
+                        EntityManager::CreateObject(EntityType::OBJECT, AssetManager::GetAssetByPath(input));
+                        input = "";
+                        ImGui::CloseCurrentPopup();
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button("Cancel", ImVec2(120, 0)))
+                    {
                         ImGui::CloseCurrentPopup();
                     }
                 }

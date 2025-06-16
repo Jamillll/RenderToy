@@ -29,10 +29,16 @@ namespace RenderToy
 			break;
 
 		case EntityType::OBJECT:
-			Object* object = (Object*)entity;
+			{
+				Object* object = (Object*)entity;
 
-			Model* model = (Model*)AssetManager::GetAssetByHandle(object->GetModel());
-			model->Draw(*temp_ModelShader, *m_Camera, *object->GetTransformData());
+				Model* model = (Model*)AssetManager::GetAssetByHandle(object->GetModel());
+				model->Draw(*temp_ModelShader, *m_Camera, *object->GetTransformData());
+			}
+			break;
+
+		default:
+			break;
 		}
 	}
 

@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include "imgui.h"
 
+#include "Entities/EntityManager.h"
+
 namespace RenderToy
 {
 	struct ApplicationState
