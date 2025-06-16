@@ -1,5 +1,9 @@
+#pragma once
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
+
+#include "../Assets/AssetManager.h"
 
 namespace RenderToy
 {
@@ -11,20 +15,37 @@ namespace RenderToy
 
 	typedef unsigned int EntityHandle;
 
+	enum EntityType
+	{
+		NULLENTITY = 0,
+		OBJECT = 1,
+	};
+
 	class Entity
 	{
 	public:
 		EntityHandle Handle = -1;
-		glm::vec3 Position = glm::vec3(0, 0, 0);
+		EntityType Type = EntityType::NULLENTITY;
+
+		Entity();
+		Entity(EntityHandle handle, EntityType type);
 	};
 
 	class EntityManager
 	{
 	private:
-		std::vector<Entity> m_Entities;
+		static std::vector<std::unique_ptr<Entity>> m_Entities;
 
 	public:
-		EntityManager();
-		~EntityManager();
+		
+		static void Initialise();
+
+		static void CreateObject(EntityType type, AssetHandle model);
+		// Create alternate functions as needed
+		//static void CreateObject(EntityType type, Model* model);
+
+		static size_t Size();
+		static Entity* GetEntityByHandle(EntityHandle handleToGet);
+		static std::string GetNameOfType(EntityType type);
 	};
 }

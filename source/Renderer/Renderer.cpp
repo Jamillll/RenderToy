@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 
 #include "../Assets/Model.h"
+#include "../Entities/Object.h"
 
 namespace RenderToy
 {
@@ -14,18 +15,20 @@ namespace RenderToy
 		m_Framebuffer = std::make_unique<Framebuffer>(windowWidth, windowHeight);
 	}
 
-	void Renderer::Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform)
+	void Renderer::Submit(EntityHandle entityHandle, ShaderProgram shaders)
 	{
-		Asset* asset = AssetManager::GetAssetByHandle(assethandle);
+		Entity* entity = EntityManager::GetEntityByHandle(entityHandle);
 
-		switch (asset->assetType)
+		switch (entity->Type)
 		{
-		case AssetType::NULLASSET:
-			return;
+		case EntityType::NULLENTITY:
+			break;
 
-		case AssetType::MODEL:
-			Model* model = (Model*)asset;
-			model->Draw(shaders, *m_Camera, transform);
+		case EntityType::OBJECT:
+			Object* object = (Object*)entity;
+
+			Model* model = (Model*)AssetManager::GetAssetByHandle(object->GetModel());
+			model->Draw(shaders, *m_Camera, *object->GetTransformData());
 		}
 	}
 

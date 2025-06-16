@@ -7,6 +7,11 @@
 
 #include "Renderer/Renderer.h"
 #include "Assets/AssetManager.h"
+#include "Entities/EntityManager.h"
+#include "Entities/Object.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace RenderToy
 {
@@ -58,6 +63,7 @@ namespace RenderToy
 
         Renderer::Initialise(1280, 720);
         AssetManager::Initialise();
+        EntityManager::Initialise();
 
         ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
@@ -87,10 +93,10 @@ namespace RenderToy
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
         AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
 
-        float position[3] = { 0, 0, 20 };
-        float scale[3] = { 10, 10, 10 };
-        float rotation = 0;
-        float pointOfRotation[3] = { 0, 0, 1 };
+        EntityManager::CreateObject(EntityType::OBJECT, 1);
+        EntityManager::CreateObject(EntityType::OBJECT, 2);
+
+        static int objectSelected = 0;
 
         while (m_Running)
         {
@@ -159,18 +165,18 @@ namespace RenderToy
                 {
                     float angle = 20.0f * i;
 
-                    Renderer::Submit(2, modelShaders, TransformData(cubePositions[i], {5, 5, 5}, angle, { 0.5f, 1.0f, 0.0f }));
+                    //Renderer::Submit(2, modelShaders, TransformData(cubePositions[i], {5, 5, 5}, angle, { 0.5f, 1.0f, 0.0f }));
                 }
 
-                TransformData backpackTransform =
-                {
-                    {position[0], position[1], position[2]},
-                    {scale[0], scale[1], scale[2]},
-                    rotation,
-                    {pointOfRotation[0], pointOfRotation[1], pointOfRotation[2]}
-                };
+                Object* object = (Object*)EntityManager::GetEntityByHandle(1);
+                Object* objecta = (Object*)EntityManager::GetEntityByHandle(2);
 
-                Renderer::Submit(1, modelShaders, backpackTransform);
+                for (size_t i = 1; i < EntityManager::Size(); i++)
+                {
+                    Renderer::Submit(i, modelShaders);
+                }
+
+                //Renderer::Submit(1, modelShaders, backpackTransform);
 
                 Renderer::EndFrame();
 
@@ -195,6 +201,27 @@ namespace RenderToy
                 ImGui::Begin("Properties");
                 ImGui::Text("%.1f FPS (%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
 
+                Entity* selectedEntity = EntityManager::GetEntityByHandle(objectSelected);
+
+                switch (selectedEntity->Type)
+                {
+                case EntityType::NULLENTITY:
+                    break;
+
+                case EntityType::OBJECT:
+
+                    Object* object = (Object*)selectedEntity;
+
+                    TransformData* transform = object->GetTransformData();
+
+                    ImGui::InputFloat3("Position", glm::value_ptr(transform->Position));
+                    ImGui::InputFloat3("scale", glm::value_ptr(transform->Scale));
+                    ImGui::InputFloat("rotation", &transform->Rotation);
+                    ImGui::InputFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation));
+
+                    break;
+                }
+
                 Camera* camera = Renderer::GetCamera();
 
                 glm::vec3 cameraPosition = camera->GetPosition();
@@ -205,13 +232,6 @@ namespace RenderToy
                 ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
                 ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
                 camera->SetPosition(cameraPosition);
-
-                ImGui::SeparatorText("Backpack Transform");
-
-                ImGui::InputFloat3("Position", position);
-                ImGui::InputFloat3("scale", scale);
-                ImGui::InputFloat("rotation", &rotation);
-                ImGui::InputFloat3("Point of rotation", pointOfRotation);
 
                 ImGui::End();
             }
@@ -230,16 +250,15 @@ namespace RenderToy
                 ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
                 ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
 
-                int node_clicked = -1;
-
-                for (size_t i = 1; i < 11; i++)
+                for (size_t i = 1; i < EntityManager::Size(); i++)
                 {
-                    if (ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Selectable Node %d", i))
+                    std::string entityName = std::to_string(i) + ". " + EntityManager::GetNameOfType(EntityManager::GetEntityByHandle(i)->Type);
+
+                    if (ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, entityName.c_str()))
                     {
                         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                         {
-                            node_clicked = i;
-                            std::cout << node_clicked;
+                            objectSelected = i;
                         }
                     }
                 }

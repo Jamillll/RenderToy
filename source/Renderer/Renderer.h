@@ -9,6 +9,7 @@
 #include "Camera.h"
 
 #include "../Assets/AssetManager.h"
+#include "../Entities/EntityManager.h"
 
 namespace RenderToy
 {
@@ -21,7 +22,8 @@ namespace RenderToy
 	public:
 		static void Initialise(float windowWidth, float windowHeight);
 
-		static void Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform);
+		static void Submit(EntityHandle entityHandle, ShaderProgram shaders);
+		//static void Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform);
 		static void Submit(VertexArray& vao, ShaderProgram shaders, TransformData transform);
 		
 		static Camera* GetCamera();
