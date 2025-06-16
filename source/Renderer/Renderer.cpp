@@ -9,13 +9,17 @@ namespace RenderToy
 	std::unique_ptr<Framebuffer> Renderer::m_Framebuffer = nullptr;
 	std::unique_ptr<Camera> Renderer::m_Camera = nullptr;
 
+	ShaderProgram* Renderer::temp_ModelShader;
+
 	void Renderer::Initialise(float windowWidth, float windowHeight)
 	{
 		m_Camera = std::make_unique<Camera>(windowWidth, windowHeight);
 		m_Framebuffer = std::make_unique<Framebuffer>(windowWidth, windowHeight);
+
+		temp_ModelShader = new ShaderProgram(RESOURCES_PATH "shaders/modelCombined.shader");
 	}
 
-	void Renderer::Submit(EntityHandle entityHandle, ShaderProgram shaders)
+	void Renderer::Submit(EntityHandle entityHandle)
 	{
 		Entity* entity = EntityManager::GetEntityByHandle(entityHandle);
 
@@ -28,7 +32,7 @@ namespace RenderToy
 			Object* object = (Object*)entity;
 
 			Model* model = (Model*)AssetManager::GetAssetByHandle(object->GetModel());
-			model->Draw(shaders, *m_Camera, *object->GetTransformData());
+			model->Draw(*temp_ModelShader, *m_Camera, *object->GetTransformData());
 		}
 	}
 

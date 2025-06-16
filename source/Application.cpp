@@ -2,6 +2,7 @@
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "imgui_stdlib.h"
 #include <stdio.h>
 #include <iostream>
 
@@ -75,28 +76,14 @@ namespace RenderToy
     {
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
-        glm::vec3 cubePositions[] = {
-            glm::vec3(0.0f,  0.0f,  0.0f),
-            glm::vec3(20.0f,  50.0f, -150.0f),
-            glm::vec3(-10.5f, -20.2f, -20.5f),
-            glm::vec3(-30.8f, -20.0f, -120.3f),
-            glm::vec3(20.4f, -0.4f, -30.5f),
-            glm::vec3(-10.7f,  30.0f, -70.5f),
-            glm::vec3(10.3f, -20.0f, -20.5f),
-            glm::vec3(10.5f,  20.0f, -20.5f),
-            glm::vec3(10.5f,  00.2f, -10.5f),
-            glm::vec3(-10.3f,  10.0f, -10.5f)
-        };
-
-        ShaderProgram modelShaders(RESOURCES_PATH "shaders/modelCombined.shader");
-
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
         AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
+        AssetManager::CreateModel(RESOURCES_PATH "plushie_shark/scene.gltf");
 
         EntityManager::CreateObject(EntityType::OBJECT, 1);
         EntityManager::CreateObject(EntityType::OBJECT, 2);
 
-        static int objectSelected = 0;
+        static EntityHandle entitySelected = 0;
 
         while (m_Running)
         {
@@ -150,121 +137,10 @@ namespace RenderToy
             ImGui::EndMainMenuBar();
             
 
-            // Scene View
-            {
-                ImGui::Begin("Scene View");
-                Renderer::StartFrame();
-
-                ImVec2 windowSize = ImGui::GetContentRegionAvail();
-                ImVec2 windowPosition = ImGui::GetCursorScreenPos();
-
-                Camera* camera = Renderer::GetCamera();
-                camera->SetAspectRatio(windowSize.x, windowSize.y);
-
-                for (size_t i = 0; i < 10; i++)
-                {
-                    float angle = 20.0f * i;
-
-                    //Renderer::Submit(2, modelShaders, TransformData(cubePositions[i], {5, 5, 5}, angle, { 0.5f, 1.0f, 0.0f }));
-                }
-
-                Object* object = (Object*)EntityManager::GetEntityByHandle(1);
-                Object* objecta = (Object*)EntityManager::GetEntityByHandle(2);
-
-                for (size_t i = 1; i < EntityManager::Size(); i++)
-                {
-                    Renderer::Submit(i, modelShaders);
-                }
-
-                //Renderer::Submit(1, modelShaders, backpackTransform);
-
-                Renderer::EndFrame();
-
-                // The first parameter of the Add image function takes an OpenGL image ID
-                // The second and third parameters define the size of the image, 
-                // the first being upper left while the second is the lower right
-                // The final two parameters define normalised texture coordinates
-                // (we're setting the same ones as openGL here)
-
-                ImGui::GetWindowDrawList()->AddImage(
-                    Renderer::GetFramebufferTextureID() ,
-                    ImVec2(windowPosition.x, windowPosition.y),
-                    ImVec2(windowPosition.x + windowSize.x, windowPosition.y + windowSize.y),
-                    ImVec2(0, 1),
-                    ImVec2(1, 0));
-
-                ImGui::End();
-            }
-
-            // Properties
-            {
-                ImGui::Begin("Properties");
-                ImGui::Text("%.1f FPS (%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
-
-                Entity* selectedEntity = EntityManager::GetEntityByHandle(objectSelected);
-
-                switch (selectedEntity->Type)
-                {
-                case EntityType::NULLENTITY:
-                    break;
-
-                case EntityType::OBJECT:
-
-                    Object* object = (Object*)selectedEntity;
-
-                    TransformData* transform = object->GetTransformData();
-
-                    ImGui::InputFloat3("Position", glm::value_ptr(transform->Position));
-                    ImGui::InputFloat3("scale", glm::value_ptr(transform->Scale));
-                    ImGui::InputFloat("rotation", &transform->Rotation);
-                    ImGui::InputFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation));
-
-                    break;
-                }
-
-                Camera* camera = Renderer::GetCamera();
-
-                glm::vec3 cameraPosition = camera->GetPosition();
-
-                ImGui::SeparatorText("Camera Transform");
-
-                ImGui::SliderFloat("Camera X", &cameraPosition.x, -200.0f, 200.0f);
-                ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
-                ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
-                camera->SetPosition(cameraPosition);
-
-                ImGui::End();
-            }
-
-            // Asset Tray
-            {
-                ImGui::Begin("Asset Tray");
-
-                ImGui::End();
-            }
-
-            // Scene Hierarchy
-            {
-                ImGui::Begin("Scene Hierarchy");
-
-                ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-                ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
-
-                for (size_t i = 1; i < EntityManager::Size(); i++)
-                {
-                    std::string entityName = std::to_string(i) + ". " + EntityManager::GetNameOfType(EntityManager::GetEntityByHandle(i)->Type);
-
-                    if (ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, entityName.c_str()))
-                    {
-                        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-                        {
-                            objectSelected = i;
-                        }
-                    }
-                }
-
-                ImGui::End();
-            }
+            SceneView();
+            Properties(entitySelected);
+            AssetTray();
+            SceneHierarchy(&entitySelected);
 
             // Rendering
             ImGui::Render();
@@ -298,4 +174,134 @@ namespace RenderToy
         glfwTerminate();
     }
 
+    void Application::SceneView()
+    {
+        ImGui::Begin("Scene View");
+        Renderer::StartFrame();
+
+        ImVec2 windowSize = ImGui::GetContentRegionAvail();
+        ImVec2 windowPosition = ImGui::GetCursorScreenPos();
+
+        Camera* camera = Renderer::GetCamera();
+        camera->SetAspectRatio(windowSize.x, windowSize.y);
+
+        for (size_t i = 1; i < EntityManager::Size(); i++)
+        {
+            Renderer::Submit(i);
+        }
+
+        Renderer::EndFrame();
+
+        ImGui::GetWindowDrawList()->AddImage(
+            Renderer::GetFramebufferTextureID(),
+            ImVec2(windowPosition.x, windowPosition.y),
+            ImVec2(windowPosition.x + windowSize.x, windowPosition.y + windowSize.y),
+            ImVec2(0, 1),
+            ImVec2(1, 0));
+
+        ImGui::End();
+    }
+
+    void Application::Properties(EntityHandle EntitySelected)
+    {
+        ImGui::Begin("Properties");
+
+        Entity* selectedEntity = EntityManager::GetEntityByHandle(EntitySelected);
+
+        switch (selectedEntity->Type)
+        {
+        case EntityType::NULLENTITY:
+            break;
+
+        case EntityType::OBJECT:
+
+            Object* object = (Object*)selectedEntity;
+
+            ImGui::InputText("Name", &object->Name);
+
+            TransformData* transform = object->GetTransformData();
+
+            ImGui::InputFloat3("Position", glm::value_ptr(transform->Position));
+            ImGui::InputFloat3("scale", glm::value_ptr(transform->Scale));
+            ImGui::InputFloat("rotation", &transform->Rotation);
+            ImGui::InputFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation));
+
+            break;
+        }
+
+        Camera* camera = Renderer::GetCamera();
+
+        glm::vec3 cameraPosition = camera->GetPosition();
+
+        ImGui::SeparatorText("Camera Transform");
+
+        ImGui::SliderFloat("Camera X", &cameraPosition.x, -200.0f, 200.0f);
+        ImGui::SliderFloat("Camera Y", &cameraPosition.y, -200.0f, 200.0f);
+        ImGui::SliderFloat("Camera Z", &cameraPosition.z, -200.0f, 200.0f);
+        camera->SetPosition(cameraPosition);
+
+        ImGui::End();
+    }
+
+    void Application::AssetTray()
+    {
+        ImGui::Begin("Asset Tray");
+
+        ImGui::End();
+    }
+
+    void Application::SceneHierarchy(EntityHandle* entitySelected)
+    {
+        ImGui::Begin("Scene Hierarchy");
+
+        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+        for (size_t i = 1; i < EntityManager::Size(); i++)
+        {
+            std::string entityName = EntityManager::GetEntityByHandle(i)->Name;
+
+            if (ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, entityName.c_str()))
+            {
+                if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+                {
+                    *entitySelected = i;
+                }
+            }
+        }
+
+        if (ImGui::TreeNodeEx((void*)(intptr_t)EntityManager::Size(), node_flags, "Create Object +"))
+        {
+            if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            {
+                ImGui::OpenPopup("Create Entity");
+            }
+
+            // Always center this window when appearing
+            ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+            ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+            if (ImGui::BeginPopupModal("Create Entity", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                static int type;
+                ImGui::Combo("Type", &type, "Object\0");
+
+                if (type + 1 == EntityType::OBJECT)
+                {
+                    static std::string input;
+                    ImGui::InputText("Asset To Use (By Handle)", &input);
+
+                    if (ImGui::Button("Create Object", ImVec2(120, 0)))
+                    {
+                        EntityManager::CreateObject(EntityType::OBJECT, std::stoi(input));
+                        ImGui::CloseCurrentPopup();
+                    }
+                }
+
+                ImGui::EndPopup();
+            }
+        }
+
+        ImGui::End();
+    }
 }

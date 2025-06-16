@@ -26,6 +26,7 @@ namespace RenderToy
 	public:
 		EntityHandle Handle = -1;
 		EntityType Type = EntityType::NULLENTITY;
+		std::string Name;
 
 		Entity();
 		Entity(EntityHandle handle, EntityType type);

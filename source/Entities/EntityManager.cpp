@@ -27,6 +27,8 @@ namespace RenderToy
 		object->Handle = m_Entities.size();
 		object->Type = type;
 
+		object->Name = std::to_string(object->Handle) + ". " + EntityManager::GetNameOfType(type);
+
 		m_Entities.push_back(std::move(object));
 	}
 

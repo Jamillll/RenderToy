@@ -24,5 +24,11 @@ namespace RenderToy
 		void Run();
 
 		~Application();
+
+	private:
+		void SceneView();
+		void Properties(EntityHandle EntitySelected);
+		void AssetTray();
+		void SceneHierarchy(EntityHandle* entitySelected);
 	};
 }

@@ -19,11 +19,12 @@ namespace RenderToy
 		static std::unique_ptr<Framebuffer> m_Framebuffer;
 		static std::unique_ptr<Camera> m_Camera;
 
+		static ShaderProgram* temp_ModelShader;
+
 	public:
 		static void Initialise(float windowWidth, float windowHeight);
 
-		static void Submit(EntityHandle entityHandle, ShaderProgram shaders);
-		//static void Submit(AssetHandle assethandle, ShaderProgram shaders, TransformData transform);
+		static void Submit(EntityHandle entityHandle);
 		static void Submit(VertexArray& vao, ShaderProgram shaders, TransformData transform);
 		
 		static Camera* GetCamera();
