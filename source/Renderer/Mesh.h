@@ -5,8 +5,8 @@
 #include <vector>
 #include <memory>
 
-#include "../Renderer/Renderer.h"
-#include "Texture.h"
+#include "Renderer.h"
+#include "../Assets/Texture.h"
 
 namespace RenderToy
 {

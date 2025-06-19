@@ -11,6 +11,7 @@ namespace RenderToy
 	struct ApplicationState
 	{
 		bool showDemoWindow = false;
+		bool SceneViewCaptured = false;
 	};
 
 	class Application
@@ -29,6 +30,7 @@ namespace RenderToy
 
 	private:
 		void SceneView();
+		void SceneViewInput();
 		void Properties(EntityHandle EntitySelected);
 		void AssetTray();
 		void SceneHierarchy(EntityHandle* entitySelected);

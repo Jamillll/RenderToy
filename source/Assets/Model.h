@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 #include "../Renderer/Renderer.h"
-#include "Mesh.h"
+#include "../Renderer/Mesh.h"
 
 #include <assimp/scene.h>
 

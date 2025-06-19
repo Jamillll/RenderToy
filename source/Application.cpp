@@ -103,7 +103,7 @@ namespace RenderToy
             ImGui::NewFrame();
             ImGui::DockSpaceOverViewport();
 
-            if (glfwGetKey(m_Window, GLFW_KEY_D))
+            if (glfwGetKey(m_Window, GLFW_KEY_D) && glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL))
                 m_State.showDemoWindow = !m_State.showDemoWindow;
 
             if (m_State.showDemoWindow)
@@ -178,6 +178,19 @@ namespace RenderToy
     void Application::SceneView()
     {
         ImGui::Begin("Scene View");
+
+        if (ImGui::IsWindowFocused())
+        {
+            m_State.SceneViewCaptured = true;
+            glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            SceneViewInput();
+        }
+        else
+        {
+            m_State.SceneViewCaptured = false;
+            glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        }
+
         Renderer::StartFrame();
 
         ImVec2 windowSize = ImGui::GetContentRegionAvail();
@@ -203,9 +216,64 @@ namespace RenderToy
         ImGui::End();
     }
 
+    void Application::SceneViewInput()
+    {
+        if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            ImGui::SetWindowFocus("Properties");
+
+        CameraEntity* camera = (CameraEntity*)EntityManager::GetEntityByHandle(1);
+
+        camera->CameraInput(m_Window);
+
+        //if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        //    camera->Position.y += camera->Speed;
+        //if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        //    camera->Position.y -= camera->Speed;
+
+        //if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
+        //    camera->Position += camera->Front * camera->Speed;
+        //if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
+        //    camera->Position -= camera->Front * camera->Speed;
+        //if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
+        //    camera->Position -= glm::normalize(glm::cross(camera->Front, camera->Up)) * camera->Speed;
+        //if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
+        //    camera->Position += glm::normalize(glm::cross(camera->Front, camera->Up)) * camera->Speed;
+
+        //double xPosition = 0.0f;
+        //double yPosition = 0.0f;
+
+        //glfwGetCursorPos(m_Window, &xPosition, &yPosition);
+
+        //float xOffset = (float)xPosition - camera->LastXPosition;
+        //float yOffset = camera->LastYPosition - (float)yPosition; // reversed since y-coordinates go from bottom to top
+        //camera->LastXPosition = (float)xPosition;
+        //camera->LastYPosition = (float)yPosition;
+
+        //xOffset *= camera->Sensitivity;
+        //yOffset *= camera->Sensitivity;
+
+        //camera->Yaw += xOffset;
+        //camera->Pitch += yOffset;
+
+        //// make sure that when pitch is out of bounds, screen doesn't get flipped
+        //if (camera->Pitch > 89.0f)
+        //    camera->Pitch = 89.0f;
+        //if (camera->Pitch < -89.0f)
+        //    camera->Pitch = -89.0f;
+
+        //glm::vec3 front;
+        //front.x = cos(glm::radians(camera->Yaw)) * cos(glm::radians(camera->Pitch));
+        //front.y = sin(glm::radians(camera->Pitch));
+        //front.z = sin(glm::radians(camera->Yaw)) * cos(glm::radians(camera->Pitch));
+        //camera->Front = glm::normalize(front);
+
+        //camera->UpdateCameraPosition();
+    }
+
     void Application::Properties(EntityHandle EntitySelected)
     {
-        ImGui::Begin("Properties");
+        if (m_State.SceneViewCaptured) ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoInputs);
+        else ImGui::Begin("Properties");
 
         Entity* selectedEntity = EntityManager::GetEntityByHandle(EntitySelected);
 
@@ -223,30 +291,10 @@ namespace RenderToy
                 TransformData* transform = object->GetTransformData();
                 ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
-                ImGui::Separator();
-                ImGui::Text("Position");
-                ImGui::PushItemWidth(windowSize.x * 0.3f);
-                ImGui::DragFloat("##position x", &transform->Position.x, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##position y", &transform->Position.y, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##position z", &transform->Position.z, 0.5f);
-
-                ImGui::Separator();
-                ImGui::Text("Scale");
-                ImGui::PushItemWidth(windowSize.x * 0.3f);
-                ImGui::DragFloat("##scale x", &transform->Scale.x, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##scale y", &transform->Scale.y, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##scale z", &transform->Scale.z, 0.5f);
-
-                ImGui::Separator();
-                ImGui::Text("Point of Rotation");
-                ImGui::PushItemWidth(windowSize.x * 0.3f);
-                ImGui::DragFloat("##por x", &transform->PointOfRotation.x, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##por y", &transform->PointOfRotation.y, 0.5f); ImGui::SameLine();
-                ImGui::DragFloat("##por z", &transform->PointOfRotation.z, 0.5f);
-
-                ImGui::Separator();
-                ImGui::Text("Rotation");
-                ImGui::SliderAngle("##slider angle", &transform->Rotation);
+                ImGui::DragFloat3("Position", glm::value_ptr(transform->Position), 0.5f);
+                ImGui::DragFloat3("Scale", glm::value_ptr(transform->Scale), 0.5f);
+                ImGui::DragFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation), 0.5f);
+                ImGui::SliderAngle("Rotation", &transform->Rotation);
             }
             break;
 
@@ -258,8 +306,10 @@ namespace RenderToy
 
                 ImGui::InputFloat3("Position", glm::value_ptr(camera->Position));
                 ImGui::InputFloat3("Front", glm::value_ptr(camera->Front));
-                ImGui::InputFloat3("Up", glm::value_ptr(camera->Up));
-                ImGui::InputFloat("Fov", &camera->Fov);
+
+                ImGui::DragFloat("Fov", &camera->Fov, 0.5f);
+                ImGui::DragFloat("Speed", &camera->Speed, 0.01f);
+                ImGui::DragFloat("Sensitivity", &camera->Sensitivity, 0.001f);
 
                 camera->UpdateCameraPosition();
             }
@@ -272,14 +322,16 @@ namespace RenderToy
 
     void Application::AssetTray()
     {
-        ImGui::Begin("Asset Tray");
+        if (m_State.SceneViewCaptured) ImGui::Begin("Asset Tray", nullptr, ImGuiWindowFlags_NoInputs);
+        else ImGui::Begin("Asset Tray");
 
         ImGui::End();
     }
 
     void Application::SceneHierarchy(EntityHandle* entitySelected)
     {
-        ImGui::Begin("Scene Hierarchy");
+        if (m_State.SceneViewCaptured) ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoInputs);
+        else ImGui::Begin("Scene Hierarchy");
 
         ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
