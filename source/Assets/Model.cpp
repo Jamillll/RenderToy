@@ -67,11 +67,15 @@ namespace RenderToy
 				mesh->mVertices[i].y,
 				mesh->mVertices[i].z);
 
-			vertex.normal = glm::vec3(
-				mesh->mNormals[i].x,
-				mesh->mNormals[i].y,
-				mesh->mNormals[i].z
-			);
+			if (mesh->HasNormals())
+			{
+				vertex.normal = glm::vec3(
+					mesh->mNormals[i].x,
+					mesh->mNormals[i].y,
+					mesh->mNormals[i].z
+				);
+			}
+			else vertex.normal = glm::vec3(0.0f, 0.0f, 0.0f);
 
 			if (mesh->mTextureCoords[0]) // if it has texture coords
 			{
@@ -103,6 +107,12 @@ namespace RenderToy
 
 			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+			if (!mesh->HasNormals())
+			{
+				std::vector<Texture> NormalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+				textures.insert(textures.end(), NormalMaps.begin(), NormalMaps.end());
+			}
 		}
 
 		return Mesh(vertices, indices, textures);

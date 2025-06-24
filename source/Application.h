@@ -30,7 +30,6 @@ namespace RenderToy
 
 	private:
 		void SceneView();
-		void SceneViewInput();
 		void Properties(EntityHandle EntitySelected);
 		void AssetTray();
 		void SceneHierarchy(EntityHandle* entitySelected);

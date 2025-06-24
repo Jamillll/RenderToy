@@ -17,6 +17,7 @@ namespace RenderToy
 	{
 		unsigned int diffuseNr = 1;
 		unsigned int specularNr = 1;
+		unsigned int normalNr = 1;
 
 		shader.Use();
 
@@ -33,6 +34,9 @@ namespace RenderToy
 				number = std::to_string(diffuseNr++);
 			else if (name == "texture_specular")
 				number = std::to_string(specularNr++);
+			else if (name == "texture_normal")
+				number = std::to_string(normalNr++);
+
 
 			shader.setI1Uniform((name + number), i + 1);
 			glBindTexture(GL_TEXTURE_2D, Textures[i].GetID());

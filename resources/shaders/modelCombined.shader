@@ -25,9 +25,12 @@ in vec2 TexCoords;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
+uniform sampler2D texture_normal1;
 
 void main()
 {    
+    // Remember to use texture for normals if the vertex doesn't contain information on normals
+
     // Potential bug: A genuine texture coordinate is set to 0, 0
     if (TexCoords != vec2(0, 0))
     {

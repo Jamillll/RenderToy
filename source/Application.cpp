@@ -183,7 +183,12 @@ namespace RenderToy
         {
             m_State.SceneViewCaptured = true;
             glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            SceneViewInput();
+
+            CameraEntity* cameraEntity = (CameraEntity*)EntityManager::GetEntityByHandle(1);
+            cameraEntity->CameraInput(m_Window);
+
+            if (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+                ImGui::SetWindowFocus("Properties");
         }
         else
         {
@@ -214,60 +219,6 @@ namespace RenderToy
             ImVec2(1, 0));
 
         ImGui::End();
-    }
-
-    void Application::SceneViewInput()
-    {
-        if (glfwGetKey(m_Window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            ImGui::SetWindowFocus("Properties");
-
-        CameraEntity* camera = (CameraEntity*)EntityManager::GetEntityByHandle(1);
-
-        camera->CameraInput(m_Window);
-
-        //if (glfwGetKey(m_Window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        //    camera->Position.y += camera->Speed;
-        //if (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        //    camera->Position.y -= camera->Speed;
-
-        //if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-        //    camera->Position += camera->Front * camera->Speed;
-        //if (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS)
-        //    camera->Position -= camera->Front * camera->Speed;
-        //if (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS)
-        //    camera->Position -= glm::normalize(glm::cross(camera->Front, camera->Up)) * camera->Speed;
-        //if (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS)
-        //    camera->Position += glm::normalize(glm::cross(camera->Front, camera->Up)) * camera->Speed;
-
-        //double xPosition = 0.0f;
-        //double yPosition = 0.0f;
-
-        //glfwGetCursorPos(m_Window, &xPosition, &yPosition);
-
-        //float xOffset = (float)xPosition - camera->LastXPosition;
-        //float yOffset = camera->LastYPosition - (float)yPosition; // reversed since y-coordinates go from bottom to top
-        //camera->LastXPosition = (float)xPosition;
-        //camera->LastYPosition = (float)yPosition;
-
-        //xOffset *= camera->Sensitivity;
-        //yOffset *= camera->Sensitivity;
-
-        //camera->Yaw += xOffset;
-        //camera->Pitch += yOffset;
-
-        //// make sure that when pitch is out of bounds, screen doesn't get flipped
-        //if (camera->Pitch > 89.0f)
-        //    camera->Pitch = 89.0f;
-        //if (camera->Pitch < -89.0f)
-        //    camera->Pitch = -89.0f;
-
-        //glm::vec3 front;
-        //front.x = cos(glm::radians(camera->Yaw)) * cos(glm::radians(camera->Pitch));
-        //front.y = sin(glm::radians(camera->Pitch));
-        //front.z = sin(glm::radians(camera->Yaw)) * cos(glm::radians(camera->Pitch));
-        //camera->Front = glm::normalize(front);
-
-        //camera->UpdateCameraPosition();
     }
 
     void Application::Properties(EntityHandle EntitySelected)
