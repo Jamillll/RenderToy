@@ -10,6 +10,7 @@ My reason for making this project is to become more familiar with the OpenGL gra
 My current plan for RenderToy 1.0 is for it to be a simple model loader and scene viewer. I want to make the program easy to use before I delve into more advanced graphics topics such as lighting.
 
 ## TODO
+- Improve Model Loading
 - Finish the Asset Tray
 - Create simple icons to use in the Asset Tray for Model Assets
 - Add a lot more information to the Asset Properties Panel
