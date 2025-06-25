@@ -7,15 +7,17 @@
 #include <iostream>
 
 #include "Renderer/Renderer.h"
+
 #include "Assets/AssetManager.h"
+#include "Assets/Model.h"
+#include "Assets/Texture.h"
+
 #include "Entities/EntityManager.h"
 #include "Entities/Object.h"
 #include "Entities/CameraEntity.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "Assets/Texture.h"
 
 namespace RenderToy
 {
@@ -248,7 +250,7 @@ namespace RenderToy
                 std::string label = "Image" + std::to_string(i);
                 std::string name = AssetManager::GetAssetByHandle(i)->name;
 
-                ImGui::Image(textureP->GetID(), { 64.0f, 64.0f });
+                ImGui::Image(textureP->GetID(), { 96.0f, 96.0f });
                 ImGui::Text(name.c_str());
                 ImGui::EndGroup();
 
@@ -356,7 +358,6 @@ namespace RenderToy
             ImGui::InputText("Name", &object->Name);
 
             TransformData* transform = object->GetTransformData();
-            ImVec2 windowSize = ImGui::GetContentRegionAvail();
 
             ImGui::DragFloat3("Position", glm::value_ptr(transform->Position), 0.5f);
             ImGui::DragFloat3("Scale", glm::value_ptr(transform->Scale), 0.5f);
@@ -387,5 +388,21 @@ namespace RenderToy
 
     void Application::AssetProperties(AssetHandle assetSelected)
     {
+        Asset* selectedAsset = AssetManager::GetAssetByHandle(assetSelected);
+
+        switch (selectedAsset->assetType)
+        {
+        case AssetType::NULLASSET:
+            break;
+
+        case AssetType::MODEL:
+        {
+            Model* model = (Model*)selectedAsset;
+
+            ImGui::InputText("Name", &model->name);
+        }
+        break;
+
+        }
     }
 }
