@@ -15,6 +15,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Assets/Texture.h"
+
 namespace RenderToy
 {
     Application::Application()
@@ -77,14 +79,17 @@ namespace RenderToy
     {
         ImGuiIO& io = ImGui::GetIO(); (void)io;
 
+        Texture icon(RESOURCES_PATH "backpack/diffuse.jpg");
+
         AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
         AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
         AssetManager::CreateModel(RESOURCES_PATH "plushie_shark/scene.gltf");
 
         EntityManager::CreateObject(EntityType::OBJECT, 1);
-        EntityManager::CreateObject(EntityType::OBJECT, 2);
+        EntityManager::CreateObject(EntityType::OBJECT, 3);
 
-        static EntityHandle entitySelected = 0;
+        unsigned int handleSelected = 0;
+        bool handleIsEntity = false;
 
         while (m_Running)
         {
@@ -138,10 +143,13 @@ namespace RenderToy
             ImGui::EndMainMenuBar();
             
 
+            // TODO: Rework RenderToy Handles to store type and to not just be linear unsigned ints
+            // This would also mean reworking Entity and Asset managers to be maps and not vectors
+
             SceneView();
-            Properties(entitySelected);
-            AssetTray();
-            SceneHierarchy(&entitySelected);
+            Properties(handleSelected, handleIsEntity);
+            AssetTray(&icon, &handleSelected, &handleIsEntity);
+            SceneHierarchy(&handleSelected, &handleIsEntity);
 
             // Rendering
             ImGui::Render();
@@ -221,65 +229,44 @@ namespace RenderToy
         ImGui::End();
     }
 
-    void Application::Properties(EntityHandle EntitySelected)
+    void Application::AssetTray(void* texture, AssetHandle* assetSelected, bool* isEntity)
     {
-        if (m_State.SceneViewCaptured) ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoInputs);
-        else ImGui::Begin("Properties");
+        if (m_State.SceneViewCaptured) ImGui::Begin("Asset Tray", nullptr, ImGuiWindowFlags_NoInputs);
+        else ImGui::Begin("Asset Tray");
 
-        Entity* selectedEntity = EntityManager::GetEntityByHandle(EntitySelected);
+        Texture* textureP = (Texture*)texture;
 
-        switch (selectedEntity->Type)
+        //TODO: Make the amount of columns resize based on window size BUT keep each item 64 by 64
+
+        if (ImGui::BeginTable("Asset Grid", 8))
         {
-        case EntityType::NULLENTITY:
-            break;
-
-        case EntityType::OBJECT:
+            for (size_t i = 1; i < AssetManager::Size(); i++)
             {
-                Object* object = (Object*)selectedEntity;
+                ImGui::TableNextColumn();
+                ImGui::BeginGroup();
 
-                ImGui::InputText("Name", &object->Name);
+                std::string label = "Image" + std::to_string(i);
+                std::string name = AssetManager::GetAssetByHandle(i)->name;
 
-                TransformData* transform = object->GetTransformData();
-                ImVec2 windowSize = ImGui::GetContentRegionAvail();
+                ImGui::Image(textureP->GetID(), { 64.0f, 64.0f });
+                ImGui::Text(name.c_str());
+                ImGui::EndGroup();
 
-                ImGui::DragFloat3("Position", glm::value_ptr(transform->Position), 0.5f);
-                ImGui::DragFloat3("Scale", glm::value_ptr(transform->Scale), 0.5f);
-                ImGui::DragFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation), 0.5f);
-                ImGui::SliderAngle("Rotation", &transform->Rotation);
+                if (ImGui::IsItemClicked(0))
+                {
+                    *assetSelected = i;
+                    *isEntity = false;
+                }
+
+                ImGui::SameLine();
             }
-            break;
-
-        case EntityType::CAMERA:
-            {
-                CameraEntity* camera = (CameraEntity*)selectedEntity;
-
-                ImGui::InputText("Name", &camera->Name);
-
-                ImGui::InputFloat3("Position", glm::value_ptr(camera->Position));
-                ImGui::InputFloat3("Front", glm::value_ptr(camera->Front));
-
-                ImGui::DragFloat("Fov", &camera->Fov, 0.5f);
-                ImGui::DragFloat("Speed", &camera->Speed, 0.01f);
-                ImGui::DragFloat("Sensitivity", &camera->Sensitivity, 0.001f);
-
-                camera->UpdateCameraPosition();
-            }
-            
-            break;
+            ImGui::EndTable();
         }
 
         ImGui::End();
     }
 
-    void Application::AssetTray()
-    {
-        if (m_State.SceneViewCaptured) ImGui::Begin("Asset Tray", nullptr, ImGuiWindowFlags_NoInputs);
-        else ImGui::Begin("Asset Tray");
-
-        ImGui::End();
-    }
-
-    void Application::SceneHierarchy(EntityHandle* entitySelected)
+    void Application::SceneHierarchy(EntityHandle* entitySelected, bool* isEntity)
     {
         if (m_State.SceneViewCaptured) ImGui::Begin("Scene Hierarchy", nullptr, ImGuiWindowFlags_NoInputs);
         else ImGui::Begin("Scene Hierarchy");
@@ -296,6 +283,7 @@ namespace RenderToy
                 if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                 {
                     *entitySelected = i;
+                    *isEntity = true;
                 }
             }
         }
@@ -339,5 +327,65 @@ namespace RenderToy
         }
 
         ImGui::End();
+    }
+
+    void Application::Properties(unsigned int handleSelected, bool isEntity)
+    {
+        if (m_State.SceneViewCaptured) ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoInputs);
+        else ImGui::Begin("Properties");
+
+        if (isEntity) EntityProperties(handleSelected);
+        else AssetProperties(handleSelected); 
+
+        ImGui::End();
+    }
+
+    void Application::EntityProperties(EntityHandle entitySelected)
+    {
+        Entity* selectedEntity = EntityManager::GetEntityByHandle(entitySelected);
+
+        switch (selectedEntity->Type)
+        {
+        case EntityType::NULLENTITY:
+            break;
+
+        case EntityType::OBJECT:
+        {
+            Object* object = (Object*)selectedEntity;
+
+            ImGui::InputText("Name", &object->Name);
+
+            TransformData* transform = object->GetTransformData();
+            ImVec2 windowSize = ImGui::GetContentRegionAvail();
+
+            ImGui::DragFloat3("Position", glm::value_ptr(transform->Position), 0.5f);
+            ImGui::DragFloat3("Scale", glm::value_ptr(transform->Scale), 0.5f);
+            ImGui::DragFloat3("Point of rotation", glm::value_ptr(transform->PointOfRotation), 0.5f);
+            ImGui::SliderAngle("Rotation", &transform->Rotation);
+        }
+        break;
+
+        case EntityType::CAMERA:
+        {
+            CameraEntity* camera = (CameraEntity*)selectedEntity;
+
+            ImGui::InputText("Name", &camera->Name);
+
+            ImGui::DragFloat3("Position", glm::value_ptr(camera->Position));
+            ImGui::DragFloat3("Front", glm::value_ptr(camera->Front));
+
+            ImGui::DragFloat("Fov", &camera->Fov, 0.5f);
+            ImGui::DragFloat("Speed", &camera->Speed, 0.01f);
+            ImGui::DragFloat("Sensitivity", &camera->Sensitivity, 0.001f);
+
+            camera->UpdateCameraPosition();
+        }
+
+        break;
+        }
+    }
+
+    void Application::AssetProperties(AssetHandle assetSelected)
+    {
     }
 }

@@ -13,7 +13,7 @@ namespace RenderToy
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
 
-		stbi_set_flip_vertically_on_load(true);
+		stbi_set_flip_vertically_on_load(false);
 
 		int width, height, nrchannels;
 		unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrchannels, 0);
@@ -51,6 +51,7 @@ namespace RenderToy
 
 	Texture::~Texture()
 	{
+		glDeleteTextures(1, &m_ID);
 	}
 
 	uint32_t Texture::GetID()

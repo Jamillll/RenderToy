@@ -56,7 +56,7 @@ namespace RenderToy
 	{
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
+		std::vector<std::shared_ptr<Texture>> textures;
 
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 		{
@@ -102,15 +102,15 @@ namespace RenderToy
 		{
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			std::vector<Texture> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
+			std::vector<std::shared_ptr<Texture>> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-			std::vector<Texture> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+			std::vector<std::shared_ptr<Texture>> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
 			if (!mesh->HasNormals())
 			{
-				std::vector<Texture> NormalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
+				std::vector<std::shared_ptr<Texture>> NormalMaps = LoadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
 				textures.insert(textures.end(), NormalMaps.begin(), NormalMaps.end());
 			}
 		}
@@ -118,9 +118,9 @@ namespace RenderToy
 		return Mesh(vertices, indices, textures);
 	}
 
-	std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName)
+	std::vector<std::shared_ptr<Texture>> Model::LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName)
 	{
-		std::vector<Texture> textures;
+		std::vector<std::shared_ptr<Texture>> textures;
 
 		for (unsigned int i = 0; i < material->GetTextureCount(type); i++)
 		{
@@ -130,7 +130,7 @@ namespace RenderToy
 			bool skip = false;
 			for (unsigned int j = 0; j < m_LoadedTextures.size(); j++)
 			{
-				if (m_LoadedTextures[j].Path == materialTexture.C_Str())
+				if (m_LoadedTextures[j]->Path == materialTexture.C_Str())
 				{
 					skip = true;
 					break;
@@ -139,9 +139,9 @@ namespace RenderToy
 
 			if (skip) continue;
 
-			Texture texture(m_Directory + "/" + materialTexture.C_Str());
-			texture.Type = typeName;
-			texture.Path = materialTexture.C_Str();
+			std::shared_ptr<Texture> texture = std::make_shared<Texture>(m_Directory + "/" + materialTexture.C_Str());
+			texture->Type = typeName;
+			texture->Path = materialTexture.C_Str();
 			textures.push_back(texture);
 
 			m_LoadedTextures.push_back(texture);

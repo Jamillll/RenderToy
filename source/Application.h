@@ -6,6 +6,9 @@
 
 #include "Entities/EntityManager.h"
 
+// TEMP
+//#include "Assets/Texture.h"
+
 namespace RenderToy
 {
 	struct ApplicationState
@@ -30,8 +33,11 @@ namespace RenderToy
 
 	private:
 		void SceneView();
-		void Properties(EntityHandle EntitySelected);
-		void AssetTray();
-		void SceneHierarchy(EntityHandle* entitySelected);
+		void AssetTray(void* texture, AssetHandle* assetSelected, bool* isEntity);
+		void SceneHierarchy(EntityHandle* entitySelected, bool* isEntity);
+
+		void Properties(unsigned int handleSelected, bool isEntity);
+		void EntityProperties(EntityHandle entitySelected);
+		void AssetProperties(AssetHandle assetSelected);
 	};
 }

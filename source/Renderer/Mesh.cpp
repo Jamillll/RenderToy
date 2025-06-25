@@ -4,7 +4,7 @@
 
 namespace RenderToy
 {
-	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures)
+	Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture>>& textures)
 	{
 		Vertices = vertices;
 		Indices = indices;
@@ -29,7 +29,7 @@ namespace RenderToy
 			glActiveTexture(GL_TEXTURE1 + i);
 
 			std::string number;
-			std::string name = Textures[i].Type;
+			std::string name = Textures[i]->Type;
 			if (name == "texture_diffuse")
 				number = std::to_string(diffuseNr++);
 			else if (name == "texture_specular")
@@ -39,7 +39,7 @@ namespace RenderToy
 
 
 			shader.setI1Uniform((name + number), i + 1);
-			glBindTexture(GL_TEXTURE_2D, Textures[i].GetID());
+			glBindTexture(GL_TEXTURE_2D, Textures[i]->GetID());
 		}
 
 		glActiveTexture(GL_TEXTURE0);

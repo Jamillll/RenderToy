@@ -1,6 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
+
 #include "../Renderer/Renderer.h"
 #include "../Renderer/Mesh.h"
 
@@ -12,7 +14,7 @@ namespace RenderToy
 	{
 	private:
 		std::vector<Mesh> m_Meshes;
-		std::vector<Texture> m_LoadedTextures;
+		std::vector<std::shared_ptr<Texture>> m_LoadedTextures;
 		std::string m_Directory;
 
 	public:
@@ -23,6 +25,6 @@ namespace RenderToy
 		void LoadModel(std::string path);
 		void ProcessNode(aiNode* node, const aiScene* scene);
 		Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
-		std::vector<Texture> LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName);
+		std::vector<std::shared_ptr<Texture>> LoadMaterialTextures(aiMaterial* material, aiTextureType type, std::string typeName);
 	};
 }

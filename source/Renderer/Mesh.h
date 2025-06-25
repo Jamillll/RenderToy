@@ -27,9 +27,9 @@ namespace RenderToy
 	public:
 		std::vector<Vertex> Vertices;
 		std::vector<unsigned int> Indices;
-		std::vector<Texture> Textures;
+		std::vector<std::shared_ptr<Texture>> Textures;
 
-		Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
+		Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<std::shared_ptr<Texture>>& textures);
 		void Draw(ShaderProgram shader, Camera& camera, TransformData transform);
 
 	private:
