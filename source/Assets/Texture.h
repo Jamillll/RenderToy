@@ -13,8 +13,11 @@ namespace RenderToy
 		std::string Type;
 		std::string Path;
 
+		Texture();
 		Texture(const std::string& path, bool flipped = false);
 		~Texture();
+
+		
 
 		uint32_t GetID();
 		void Activate(int textureUnit);

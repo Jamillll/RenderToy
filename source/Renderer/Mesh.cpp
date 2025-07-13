@@ -42,8 +42,6 @@ namespace RenderToy
 			glBindTexture(GL_TEXTURE_2D, Textures[i]->GetID());
 		}
 
-		glActiveTexture(GL_TEXTURE0);
-
 		//for (size_t i = 0; i < Vertices.size(); i++)
 		//{
 		//	std::cout << i << " = ";
@@ -54,6 +52,25 @@ namespace RenderToy
 		//}
 
 		m_VAO->Draw();
+
+		for (size_t i = 0; i < Textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE1 + i);
+
+			std::string number;
+			std::string name = Textures[i]->Type;
+			if (name == "texture_diffuse")
+				number = std::to_string(diffuseNr++);
+			else if (name == "texture_specular")
+				number = std::to_string(specularNr++);
+			else if (name == "texture_normal")
+				number = std::to_string(normalNr++);
+
+			shader.setI1Uniform((name + number), 0);
+
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 	void Mesh::SetupMesh()

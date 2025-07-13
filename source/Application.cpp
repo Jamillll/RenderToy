@@ -83,9 +83,9 @@ namespace RenderToy
 
         Texture icon(RESOURCES_PATH "backpack/diffuse.jpg");
 
-        AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj");
+        AssetManager::CreateModel(RESOURCES_PATH "backpack/backpack.obj", true);
         AssetManager::CreateModel(RESOURCES_PATH "cube/cube.obj");
-        AssetManager::CreateModel(RESOURCES_PATH "plushie_shark/scene.gltf");
+        AssetManager::CreateModel(RESOURCES_PATH "plushie_shark/scene.gltf", false);
 
         EntityManager::CreateObject(EntityType::OBJECT, 1);
         EntityManager::CreateObject(EntityType::OBJECT, 3);

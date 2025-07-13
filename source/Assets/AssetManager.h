@@ -11,6 +11,7 @@ namespace RenderToy
 	{
 		NULLASSET = 0,
 		MODEL = 1,
+		MATERIAL = 2,
 	};
 
 	class Asset
@@ -30,7 +31,7 @@ namespace RenderToy
 	public:
 		static void Initialise();
 
-		static void CreateModel(const std::string& path);
+		static void CreateModel(const std::string& path, bool texturesFlipped = false);
 
 		static size_t Size();
 		static Asset* GetAssetByHandle(AssetHandle handle);

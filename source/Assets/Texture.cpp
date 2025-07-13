@@ -7,13 +7,16 @@
 
 namespace RenderToy
 {
+	Texture::Texture()
+		: m_ID(NULL), Type("NULL"), Path("NULL") {}
+
 	Texture::Texture(const std::string& path, bool flipped)
 		: Path(path)
 	{
 		glGenTextures(1, &m_ID);
 		glBindTexture(GL_TEXTURE_2D, m_ID);
 
-		stbi_set_flip_vertically_on_load(false);
+		stbi_set_flip_vertically_on_load(flipped);
 
 		int width, height, nrchannels;
 		unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrchannels, 0);

@@ -21,9 +21,9 @@ namespace RenderToy
 		m_Assets.push_back(std::move(nullAsset));
 	}
 
-	void AssetManager::CreateModel(const std::string& path)
+	void AssetManager::CreateModel(const std::string& path, bool texturesFlipped)
 	{
-		std::unique_ptr<Model> model = std::make_unique<Model>(path);
+		std::unique_ptr<Model> model = std::make_unique<Model>(path, texturesFlipped);
 		model->assetHandle = m_Assets.size();
 		model->assetType = AssetType::MODEL;
 		model->path = path;

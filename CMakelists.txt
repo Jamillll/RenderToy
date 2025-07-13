@@ -12,7 +12,7 @@ project("RenderToy")
 set(CMAKE_SXX_STANDARD 17)
 add_executable(${CMAKE_PROJECT_NAME})
 
-# MY_SOURCES is defined to be a list of all the source files for my game 
+# MY_SOURCES is defined to be a list of all the source files for my App 
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp" 
 												"${CMAKE_CURRENT_SOURCE_DIR}/source/*.h"
 												"${CMAKE_CURRENT_SOURCE_DIR}/vendor/*.c"

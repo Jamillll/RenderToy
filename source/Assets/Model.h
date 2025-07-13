@@ -16,9 +16,10 @@ namespace RenderToy
 		std::vector<Mesh> m_Meshes;
 		std::vector<std::shared_ptr<Texture>> m_LoadedTextures;
 		std::string m_Directory;
+		bool m_TexturesFlipped = false;
 
 	public:
-		Model(std::string path);
+		Model(std::string path, bool texturesFlipped = false);
 		void Draw(ShaderProgram shader, Camera& camera, TransformData transform);
 
 	private:

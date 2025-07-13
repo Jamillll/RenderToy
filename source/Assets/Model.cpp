@@ -5,8 +5,9 @@
 
 namespace RenderToy
 {
-	Model::Model(std::string path)
+	Model::Model(std::string path, bool texturesFlipped)
 	{
+		m_TexturesFlipped = texturesFlipped;
 		LoadModel(path);
 	}
 
@@ -139,7 +140,7 @@ namespace RenderToy
 
 			if (skip) continue;
 
-			std::shared_ptr<Texture> texture = std::make_shared<Texture>(m_Directory + "/" + materialTexture.C_Str());
+			std::shared_ptr<Texture> texture = std::make_shared<Texture>(m_Directory + "/" + materialTexture.C_Str(), m_TexturesFlipped);
 			texture->Type = typeName;
 			texture->Path = materialTexture.C_Str();
 			textures.push_back(texture);
